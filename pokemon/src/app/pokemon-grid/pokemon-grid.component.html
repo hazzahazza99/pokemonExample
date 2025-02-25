@@ -1,0 +1,41 @@
+<dx-data-grid
+  [dataSource]="pokemonList$ | async"  
+  [keyExpr]="'pokemonID'"
+  [columns]="columns"
+  [allowColumnResizing]="true"
+  [columnAutoWidth]="true"
+  [paging]="{ pageSize: 10 }"
+  [filterRow]="{ visible: true }"
+  [searchPanel]="{ visible: true }"
+  [showBorders]="true"
+  (onRowClick)="openDrawer($event)">
+</dx-data-grid>
+
+<dx-drawer
+  [opened]="isDrawerOpen"
+  [closeOnOutsideClick]="true"
+  [height]="'100vh'"
+  [position]="'right'"
+  [revealMode]="'slide'"
+  (onOptionChanged)="handleDrawerClose($event)">
+
+  <div *ngIf="selectedPokemon">
+    <h3>Edit Pokémon</h3>
+    <dx-form
+      [formData]="selectedPokemon"
+      [colCount]="2">
+      
+      <dxi-item dataField="pokemonID" [editorOptions]="{ disabled: true }"></dxi-item>
+      <dxi-item dataField="name"></dxi-item>
+      <dxi-item dataField="type"></dxi-item>
+      <dxi-item dataField="level"></dxi-item>
+
+      <dxi-item>
+        <dx-button text="Save" type="success" (onClick)="saveChanges()"></dx-button>
+        <dx-button text="Close" type="danger" (onClick)="isDrawerOpen = false"></dx-button>
+      </dxi-item>
+      
+    </dx-form>
+  </div>
+
+</dx-drawer>
