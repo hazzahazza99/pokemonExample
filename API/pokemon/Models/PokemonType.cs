@@ -4,12 +4,11 @@ namespace Pokemon.Models
 {
     public class PokemonType
     {
-        [Key]
-        public int PokemonID { get; set; }
-        public int TypeListID { get; set; }
+        public int TypesPokemonID { get; set; }
+        public int TypesPokeTypeID { get; set; } 
 
         public virtual PokemonData Pokemon { get; set; }
-        public virtual TypeList TypeList { get; set; }
+        public virtual PokeType PokeType { get; set; } 
     }
 
 }

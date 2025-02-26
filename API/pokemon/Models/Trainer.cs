@@ -8,10 +8,13 @@ namespace Pokemon.Models
         [Key]
         public int TrainerID { get; set; }
         public string TrainerName { get; set; }
-        public int? TrainerAge { get; set; }
-        public string TrainerBadge { get; set; }
-        public bool IsGymLeader { get; set; }
-        public virtual ICollection<PokemonData> Pokemons { get; set; }
+        public int TrainerAge { get; set; }
+        public int TrainerBadge { get; set; }
+        public bool TrainerIsGymLeader { get; set; }
+        public int? TrainerPhotoID { get; set; }
+
+        public virtual Picture TrainerPhoto { get; set; }
+        public virtual ICollection<PokemonData> Pokemon { get; set; }
     }
 
 }

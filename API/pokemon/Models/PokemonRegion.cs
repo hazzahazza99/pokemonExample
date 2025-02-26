@@ -5,9 +5,8 @@ namespace Pokemon.Models
 {
     public class PokemonRegion
     {
-        [Key]
-        public int PokemonID { get; set; }
-        public int RegionID { get; set; }
+        public int RegionsPokemonID { get; set; }
+        public int RegionsRegionID { get; set; }
 
         public virtual PokemonData Pokemon { get; set; }
         public virtual Region Region { get; set; }

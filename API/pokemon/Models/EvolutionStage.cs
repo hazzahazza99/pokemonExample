@@ -2,12 +2,10 @@
 
 namespace Pokemon.Models
 {
-    public class Evolution
+    public class EvolutionStage
     {
-        [Key]
-        public int EvolutionID { get; set; }
-        public int StageNumber { get; set; }
-        public int EvolutionGroupID { get; set; }
+        public int GroupID { get; set; }
+        public int StageOrder { get; set; }
         public int PokemonID { get; set; }
 
         public virtual EvolutionGroup EvolutionGroup { get; set; }

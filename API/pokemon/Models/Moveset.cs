@@ -5,8 +5,8 @@ namespace Pokemon.Models
 {
     public class Moveset
     {
-        public int PokemonID { get; set; }
-        public int MoveID { get; set; }
+        public int MovesetPokemonID { get; set; }
+        public int MovesetMoveID { get; set; }
 
         public virtual PokemonData Pokemon { get; set; }
         public virtual Move Move { get; set; }

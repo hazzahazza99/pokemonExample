@@ -6,8 +6,9 @@ namespace Pokemon.Dtos
     {
         public int TrainerID { get; set; }
         public string TrainerName { get; set; }
-        public int? TrainerAge { get; set; }
-        public string TrainerBadge { get; set; }
-        public bool IsGymLeader { get; set; }
+        public int TrainerAge { get; set; }
+        public int TrainerBadge { get; set; }
+        public bool TrainerIsGymLeader { get; set; }
+        public string TrainerPhotoPath { get; set; }
     }
 }

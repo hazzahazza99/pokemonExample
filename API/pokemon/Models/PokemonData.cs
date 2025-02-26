@@ -8,15 +8,16 @@ namespace Pokemon.Models
         [Key]
         public int PokemonID { get; set; }
         public string PokemonName { get; set; }
-        public int? TrainerID { get; set; }
-        public int? PictureID { get; set; }
+        public int PokemonPictureID { get; set; }
         public int? EvolutionGroupID { get; set; }
+        public int? PokemonTrainerID { get; set; }
 
-        public virtual Picture Picture { get; set; }
-        public virtual EvolutionGroup EvolutionGroup { get; set; }
+        public virtual Picture PokemonPicture { get; set; }
         public virtual Trainer Trainer { get; set; }
-        public virtual ICollection<PokemonRegion> PokemonRegions { get; set; }
-        public virtual ICollection<Moveset> Movesets { get; set; }
+        public virtual EvolutionGroup EvolutionGroup { get; set; }
+        public virtual ICollection<PokemonType> PokemonTypes { get; set; }
+        public virtual ICollection<Moveset> Moves { get; set; }
+        public virtual ICollection<PokemonRegion> Regions { get; set; }
+        public virtual ICollection<EvolutionStage> EvolutionStages { get; set; }
     }
-
 }

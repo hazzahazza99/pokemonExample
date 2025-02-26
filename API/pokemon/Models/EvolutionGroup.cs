@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Pokemon.Models
 {
     public class EvolutionGroup
     {
-        [Key]
         public int EvolutionGroupID { get; set; }
-        public string? EvolutionGroupName { get; set; }
-        public virtual ICollection<Evolution> Evolutions { get; set; }
+        public virtual ICollection<PokemonData> PokemonData { get; set; }
+        public virtual ICollection<EvolutionStage> EvolutionStages { get; set; }
     }
 }

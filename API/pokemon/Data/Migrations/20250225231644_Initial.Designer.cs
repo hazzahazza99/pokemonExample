@@ -8,11 +8,11 @@ using Pokemon.Data;
 
 #nullable disable
 
-namespace Pokemon.Migrations
+namespace Pokemon.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250221153326_UpdatedDb5")]
-    partial class UpdatedDb5
+    [Migration("20250225231644_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,32 +24,6 @@ namespace Pokemon.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Pokemon.Models.Evolution", b =>
-                {
-                    b.Property<int>("EvolutionID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EvolutionID"));
-
-                    b.Property<int>("EvolutionGroupID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PokemonID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StageNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("EvolutionID");
-
-                    b.HasIndex("EvolutionGroupID");
-
-                    b.HasIndex("PokemonID");
-
-                    b.ToTable("Evolutions");
-                });
-
             modelBuilder.Entity("Pokemon.Models.EvolutionGroup", b =>
                 {
                     b.Property<int>("EvolutionGroupID")
@@ -58,12 +32,27 @@ namespace Pokemon.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EvolutionGroupID"));
 
-                    b.Property<string>("EvolutionGroupName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("EvolutionGroupID");
 
                     b.ToTable("EvolutionGroups");
+                });
+
+            modelBuilder.Entity("Pokemon.Models.EvolutionStage", b =>
+                {
+                    b.Property<int>("GroupID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StageOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PokemonID")
+                        .HasColumnType("int");
+
+                    b.HasKey("GroupID", "StageOrder");
+
+                    b.HasIndex("PokemonID");
+
+                    b.ToTable("EvolutionStages");
                 });
 
             modelBuilder.Entity("Pokemon.Models.Move", b =>
@@ -81,29 +70,30 @@ namespace Pokemon.Migrations
                     b.Property<int>("MovePP")
                         .HasColumnType("int");
 
+                    b.Property<int>("MovePokeTypeID")
+                        .HasColumnType("int");
+
                     b.Property<int>("MovePower")
                         .HasColumnType("int");
 
-                    b.Property<string>("MoveType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("MoveID");
+
+                    b.HasIndex("MovePokeTypeID");
 
                     b.ToTable("Moves");
                 });
 
             modelBuilder.Entity("Pokemon.Models.Moveset", b =>
                 {
-                    b.Property<int>("PokemonID")
+                    b.Property<int>("MovesetPokemonID")
                         .HasColumnType("int");
 
-                    b.Property<int>("MoveID")
+                    b.Property<int>("MovesetMoveID")
                         .HasColumnType("int");
 
-                    b.HasKey("PokemonID", "MoveID");
+                    b.HasKey("MovesetPokemonID", "MovesetMoveID");
 
-                    b.HasIndex("MoveID");
+                    b.HasIndex("MovesetMoveID");
 
                     b.ToTable("Movesets");
                 });
@@ -116,13 +106,30 @@ namespace Pokemon.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PictureID"));
 
-                    b.Property<string>("PictureURL")
+                    b.Property<string>("PicturePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PictureID");
 
                     b.ToTable("Pictures");
+                });
+
+            modelBuilder.Entity("Pokemon.Models.PokeType", b =>
+                {
+                    b.Property<int>("PokeTypeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PokeTypeID"));
+
+                    b.Property<string>("TypeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PokeTypeID");
+
+                    b.ToTable("PokeTypes");
                 });
 
             modelBuilder.Entity("Pokemon.Models.PokemonData", b =>
@@ -136,53 +143,53 @@ namespace Pokemon.Migrations
                     b.Property<int?>("EvolutionGroupID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PictureID")
-                        .HasColumnType("int");
-
                     b.Property<string>("PokemonName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TrainerID")
+                    b.Property<int>("PokemonPictureID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PokemonTrainerID")
                         .HasColumnType("int");
 
                     b.HasKey("PokemonID");
 
                     b.HasIndex("EvolutionGroupID");
 
-                    b.HasIndex("PictureID");
+                    b.HasIndex("PokemonPictureID");
 
-                    b.HasIndex("TrainerID");
+                    b.HasIndex("PokemonTrainerID");
 
-                    b.ToTable("PokemonData");
+                    b.ToTable("Pokemon");
                 });
 
             modelBuilder.Entity("Pokemon.Models.PokemonRegion", b =>
                 {
-                    b.Property<int>("PokemonID")
+                    b.Property<int>("RegionsPokemonID")
                         .HasColumnType("int");
 
-                    b.Property<int>("RegionID")
+                    b.Property<int>("RegionsRegionID")
                         .HasColumnType("int");
 
-                    b.HasKey("PokemonID", "RegionID");
+                    b.HasKey("RegionsPokemonID", "RegionsRegionID");
 
-                    b.HasIndex("RegionID");
+                    b.HasIndex("RegionsRegionID");
 
                     b.ToTable("PokemonRegions");
                 });
 
             modelBuilder.Entity("Pokemon.Models.PokemonType", b =>
                 {
-                    b.Property<int>("PokemonID")
+                    b.Property<int>("TypesPokemonID")
                         .HasColumnType("int");
 
-                    b.Property<int>("TypeListID")
+                    b.Property<int>("TypesPokeTypeID")
                         .HasColumnType("int");
 
-                    b.HasKey("PokemonID", "TypeListID");
+                    b.HasKey("TypesPokemonID", "TypesPokeTypeID");
 
-                    b.HasIndex("TypeListID");
+                    b.HasIndex("TypesPokeTypeID");
 
                     b.ToTable("PokemonTypes");
                 });
@@ -216,54 +223,41 @@ namespace Pokemon.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrainerID"));
 
-                    b.Property<bool>("IsGymLeader")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("TrainerAge")
+                    b.Property<int>("TrainerAge")
                         .HasColumnType("int");
 
-                    b.Property<string>("TrainerBadge")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TrainerBadge")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("TrainerIsGymLeader")
+                        .HasColumnType("bit");
 
                     b.Property<string>("TrainerName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("TrainerPhotoID")
+                        .HasColumnType("int");
+
                     b.HasKey("TrainerID");
+
+                    b.HasIndex("TrainerPhotoID");
 
                     b.ToTable("Trainers");
                 });
 
-            modelBuilder.Entity("Pokemon.Models.TypeList", b =>
-                {
-                    b.Property<int>("TypeListID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TypeListID"));
-
-                    b.Property<string>("TypeName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("TypeListID");
-
-                    b.ToTable("TypeLists");
-                });
-
-            modelBuilder.Entity("Pokemon.Models.Evolution", b =>
+            modelBuilder.Entity("Pokemon.Models.EvolutionStage", b =>
                 {
                     b.HasOne("Pokemon.Models.EvolutionGroup", "EvolutionGroup")
-                        .WithMany("Evolutions")
-                        .HasForeignKey("EvolutionGroupID")
+                        .WithMany("EvolutionStages")
+                        .HasForeignKey("GroupID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Pokemon.Models.PokemonData", "Pokemon")
-                        .WithMany()
+                        .WithMany("EvolutionStages")
                         .HasForeignKey("PokemonID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("EvolutionGroup");
@@ -271,18 +265,29 @@ namespace Pokemon.Migrations
                     b.Navigation("Pokemon");
                 });
 
+            modelBuilder.Entity("Pokemon.Models.Move", b =>
+                {
+                    b.HasOne("Pokemon.Models.PokeType", "MovePokeType")
+                        .WithMany("Moves")
+                        .HasForeignKey("MovePokeTypeID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MovePokeType");
+                });
+
             modelBuilder.Entity("Pokemon.Models.Moveset", b =>
                 {
                     b.HasOne("Pokemon.Models.Move", "Move")
                         .WithMany("Movesets")
-                        .HasForeignKey("MoveID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("MovesetMoveID")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Pokemon.Models.PokemonData", "Pokemon")
-                        .WithMany("Movesets")
-                        .HasForeignKey("PokemonID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithMany("Moves")
+                        .HasForeignKey("MovesetPokemonID")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Move");
@@ -293,20 +298,24 @@ namespace Pokemon.Migrations
             modelBuilder.Entity("Pokemon.Models.PokemonData", b =>
                 {
                     b.HasOne("Pokemon.Models.EvolutionGroup", "EvolutionGroup")
-                        .WithMany()
-                        .HasForeignKey("EvolutionGroupID");
+                        .WithMany("PokemonData")
+                        .HasForeignKey("EvolutionGroupID")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Pokemon.Models.Picture", "Picture")
+                    b.HasOne("Pokemon.Models.Picture", "PokemonPicture")
                         .WithMany()
-                        .HasForeignKey("PictureID");
+                        .HasForeignKey("PokemonPictureID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Pokemon.Models.Trainer", "Trainer")
-                        .WithMany("Pokemons")
-                        .HasForeignKey("TrainerID");
+                        .WithMany("Pokemon")
+                        .HasForeignKey("PokemonTrainerID")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("EvolutionGroup");
 
-                    b.Navigation("Picture");
+                    b.Navigation("PokemonPicture");
 
                     b.Navigation("Trainer");
                 });
@@ -314,15 +323,15 @@ namespace Pokemon.Migrations
             modelBuilder.Entity("Pokemon.Models.PokemonRegion", b =>
                 {
                     b.HasOne("Pokemon.Models.PokemonData", "Pokemon")
-                        .WithMany("PokemonRegions")
-                        .HasForeignKey("PokemonID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithMany("Regions")
+                        .HasForeignKey("RegionsPokemonID")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Pokemon.Models.Region", "Region")
                         .WithMany("PokemonRegions")
-                        .HasForeignKey("RegionID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("RegionsRegionID")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Pokemon");
@@ -332,26 +341,38 @@ namespace Pokemon.Migrations
 
             modelBuilder.Entity("Pokemon.Models.PokemonType", b =>
                 {
-                    b.HasOne("Pokemon.Models.PokemonData", "Pokemon")
-                        .WithMany()
-                        .HasForeignKey("PokemonID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("Pokemon.Models.PokeType", "PokeType")
+                        .WithMany("PokemonTypes")
+                        .HasForeignKey("TypesPokeTypeID")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Pokemon.Models.TypeList", "TypeList")
+                    b.HasOne("Pokemon.Models.PokemonData", "Pokemon")
                         .WithMany("PokemonTypes")
-                        .HasForeignKey("TypeListID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("TypesPokemonID")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("PokeType");
 
                     b.Navigation("Pokemon");
+                });
 
-                    b.Navigation("TypeList");
+            modelBuilder.Entity("Pokemon.Models.Trainer", b =>
+                {
+                    b.HasOne("Pokemon.Models.Picture", "TrainerPhoto")
+                        .WithMany()
+                        .HasForeignKey("TrainerPhotoID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("TrainerPhoto");
                 });
 
             modelBuilder.Entity("Pokemon.Models.EvolutionGroup", b =>
                 {
-                    b.Navigation("Evolutions");
+                    b.Navigation("EvolutionStages");
+
+                    b.Navigation("PokemonData");
                 });
 
             modelBuilder.Entity("Pokemon.Models.Move", b =>
@@ -359,11 +380,22 @@ namespace Pokemon.Migrations
                     b.Navigation("Movesets");
                 });
 
+            modelBuilder.Entity("Pokemon.Models.PokeType", b =>
+                {
+                    b.Navigation("Moves");
+
+                    b.Navigation("PokemonTypes");
+                });
+
             modelBuilder.Entity("Pokemon.Models.PokemonData", b =>
                 {
-                    b.Navigation("Movesets");
+                    b.Navigation("EvolutionStages");
 
-                    b.Navigation("PokemonRegions");
+                    b.Navigation("Moves");
+
+                    b.Navigation("PokemonTypes");
+
+                    b.Navigation("Regions");
                 });
 
             modelBuilder.Entity("Pokemon.Models.Region", b =>
@@ -373,12 +405,7 @@ namespace Pokemon.Migrations
 
             modelBuilder.Entity("Pokemon.Models.Trainer", b =>
                 {
-                    b.Navigation("Pokemons");
-                });
-
-            modelBuilder.Entity("Pokemon.Models.TypeList", b =>
-                {
-                    b.Navigation("PokemonTypes");
+                    b.Navigation("Pokemon");
                 });
 #pragma warning restore 612, 618
         }
