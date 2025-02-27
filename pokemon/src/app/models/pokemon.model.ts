@@ -1,36 +1,45 @@
-import { Trainer } from "./trainer.model";
-
 export interface Pokemon {
-    pokemonID: number;
-    pokemonName: string;
-    trainerID?: number;
-    pictureID?: number;
-    pictureURL?: string;
-    trainer?: Trainer;
-    pokemonRegions?: PokemonRegion[];
-    movesets?: Moveset[];
-    evolutionGroup?: EvolutionGroup;
-  }
-  
-  export interface UpdatePokemon {
-    pokemonName: string;
-    trainerID?: number;
-    pictureID?: number;
-    evolutionGroupID?: number;
-  }
-  
-  export interface PokemonRegion {
-    regionID: number;
-    regionName: string;
-  }
-  
-  export interface Moveset {
-    moveID: number;
-    moveName: string;
-  }
-  
-  export interface EvolutionGroup {
-    evolutionGroupID: number;
-    evolutionGroupName: string;
-  }
-  
+  pokemonID: number;
+  pokemonName: string;
+  types: string[];
+  moves: string[];
+  regions: string[];
+  evolutionGroup?: EvolutionGroup;
+  trainer?: Trainer;
+  pokemonPicture: Picture;
+}
+
+export interface UpdatePokemon {
+  pokemonName: string;
+  types: string[];
+  moves: string[];
+  regions: string[];
+  evolutionGroup?: EvolutionGroup | null;  
+  trainer?: Trainer | null;               
+  pokemonPicture?: Picture;
+}
+
+interface EvolutionGroup {
+  groupID: number;
+  evolutionStages: EvolutionStage[];
+}
+
+interface EvolutionStage {
+  stageOrder: number;
+  pokemon: SimplePokemon;
+}
+
+interface SimplePokemon {
+  pokemonID: number;
+  pokemonName: string;
+}
+
+interface Trainer {
+  trainerID: number;
+  trainerName: string;
+}
+
+interface Picture {
+  pictureID: number;
+  picturePath: string;
+}

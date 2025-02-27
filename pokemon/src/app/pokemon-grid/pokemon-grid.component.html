@@ -8,34 +8,85 @@
   [filterRow]="{ visible: true }"
   [searchPanel]="{ visible: true }"
   [showBorders]="true"
-  (onRowClick)="openDrawer($event)">
+  (onRowClick)="openDrawer($event.data)">
+  
+  <dxo-editing mode="popup"></dxo-editing>
+  
+  <dxo-toolbar>
+    <dxi-item location="before">
+      <dx-button
+        icon="plus"
+        text="Add New Pokémon"
+        (onClick)="openDrawer()">
+      </dx-button>
+    </dxi-item>
+  </dxo-toolbar>
+
+  <div *dxTemplate="let data of 'imageTemplate'">
+    <img [src]="data.value" width="50" height="50" alt="Pokemon Image">
+  </div>
 </dx-data-grid>
 
 <dx-drawer
   [opened]="isDrawerOpen"
-  [closeOnOutsideClick]="true"
   [height]="'100vh'"
   [position]="'right'"
   [revealMode]="'slide'"
+  [shading]="false"
+  [width]="'30%'"
+  [animationEnabled]="true"
   (onOptionChanged)="handleDrawerClose($event)">
 
-  <div *ngIf="selectedPokemon">
-    <h3>Edit Pokémon</h3>
+  <div *ngIf="selectedPokemon" class="drawer-content">
+    <h3>{{ isNewPokemon ? 'Add New' : 'Edit' }} Pokémon</h3>
+    
+    <div class="pokemon-image-container">
+      <img 
+        [src]="selectedPokemon.pokemonPicture.picturePath" 
+        width="100" 
+        height="100" 
+        alt="Pokemon Image"
+      />
+    </div>
+
     <dx-form
       [formData]="selectedPokemon"
-      [colCount]="2">
-      
-      <dxi-item dataField="pokemonID" [editorOptions]="{ disabled: true }"></dxi-item>
-      <dxi-item dataField="name"></dxi-item>
-      <dxi-item dataField="type"></dxi-item>
-      <dxi-item dataField="level"></dxi-item>
+      [colCount]="2"
+      [showValidationSummary]="true">
 
-      <dxi-item>
-        <dx-button text="Save" type="success" (onClick)="saveChanges()"></dx-button>
-        <dx-button text="Close" type="danger" (onClick)="isDrawerOpen = false"></dx-button>
+      <dxi-item 
+        dataField="pokemonName" 
+        [validationRules]="[{ type: 'required', message: 'Pokémon name is required' }]">
       </dxi-item>
       
+      <dxi-item dataField="types"></dxi-item>
+      <dxi-item dataField="moves"></dxi-item>
+      <dxi-item dataField="regions"></dxi-item>
+      
+      <dxi-item
+        dataField="evolutionGroup.evolutionStages"
+        caption="Evolution Stages"
+        [editorOptions]="{ disabled: true }">
+        <div *dxTemplate="let data of 'content'">
+          <div *ngFor="let stage of data.component.option('formData').evolutionGroup?.evolutionStages || []" 
+              class="evolution-stage">
+            Stage {{ stage.stageOrder }}: {{ stage.pokemon.pokemonName }}
+          </div>
+        </div>
+      </dxi-item>
+      
+      <dxi-item>
+        <dx-button 
+          text="Save" 
+          type="success" 
+          (onClick)="saveChanges()">
+        </dx-button>
+        <dx-button 
+          text="Cancel" 
+          type="danger" 
+          (onClick)="closeDrawer()">
+        </dx-button>
+      </dxi-item>
     </dx-form>
   </div>
-
 </dx-drawer>

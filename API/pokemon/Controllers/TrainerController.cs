@@ -1,87 +1,126 @@
-﻿//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.EntityFrameworkCore;
-//using Pokemon.Data;
-//using Pokemon.Dtos;
-//using Pokemon.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Pokemon.Data;
+using Pokemon.Dtos;
+using Pokemon.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-//namespace Pokemon.Controllers
-//{
-//    [Route("api/[controller]")]
-//    [ApiController]
-//    public class TrainerController : ControllerBase
-//    {
-//        private readonly DataContext _context;
+namespace Pokemon.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class TrainerController : ControllerBase
+    {
+        private readonly DataContext _context;
 
-//        public TrainerController(DataContext context)
-//        {
-//            _context = context;
-//        }
+        public TrainerController(DataContext context)
+        {
+            _context = context;
+        }
 
-//        [HttpGet("trainers")]
-//        public async Task<IActionResult> GetAllTrainers()
-//        {
-//            var trainerList = await _context.Trainers
-//                .Include(t => t.Pokemons)
-//                .ToListAsync();
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TrainerDto>>> GetTrainers()
+        {
+            var trainers = await _context.Trainers
+                .Select(t => new TrainerDto
+                {
+                    TrainerID = t.TrainerID,
+                    TrainerName = t.TrainerName,
+                    TrainerAge = t.TrainerAge,
+                    TrainerBadge = t.TrainerBadge,
+                    TrainerIsGymLeader = t.TrainerIsGymLeader,
+                    TrainerPhotoID = t.TrainerPhotoID
+                })
+                .ToListAsync();
 
-//            var trainerDtos = trainerList.Select(t => new TrainerDto
-//            {
-//                TrainerID = t.TrainerID,
-//                TrainerName = t.TrainerName,
-//                TrainerAge = t.TrainerAge,
-//                TrainerBadge = t.TrainerBadge,
-//                IsGymLeader = t.IsGymLeader
-//            }).ToList();
+            return trainers;
+        }
 
-//            return Ok(trainerDtos);
-//        }
-//        [HttpPost("trainers")]
-//        public async Task<IActionResult> AddTrainer([FromBody] CreateTrainerDto createTrainerDto)
-//        {
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TrainerDto>> GetTrainer(int id)
+        {
+            var trainer = await _context.Trainers
+                .Where(t => t.TrainerID == id)
+                .Select(t => new TrainerDto
+                {
+                    TrainerID = t.TrainerID,
+                    TrainerName = t.TrainerName,
+                    TrainerAge = t.TrainerAge,
+                    TrainerBadge = t.TrainerBadge,
+                    TrainerIsGymLeader = t.TrainerIsGymLeader,
+                    TrainerPhotoID = t.TrainerPhotoID
+                })
+                .FirstOrDefaultAsync();
 
-//            var newTrainer = new Trainer
-//            {
-//                TrainerName = createTrainerDto.TrainerName,
-//                TrainerAge = createTrainerDto.TrainerAge,
-//                TrainerBadge = createTrainerDto.TrainerBadge,
-//                IsGymLeader = createTrainerDto.IsGymLeader
-//            };
+            if (trainer == null)
+            {
+                return NotFound();
+            }
 
-//            _context.Trainers.Add(newTrainer);
-//            await _context.SaveChangesAsync();
+            return trainer;
+        }
 
-//            var newTrainerDto = new TrainerDto
-//            {
-//                TrainerID = newTrainer.TrainerID,
-//                TrainerName = newTrainer.TrainerName,
-//                TrainerAge = newTrainer.TrainerAge,
-//                TrainerBadge = newTrainer.TrainerBadge,
-//                IsGymLeader = newTrainer.IsGymLeader
-//            };
+        [HttpPost]
+        public async Task<ActionResult<TrainerDto>> PostTrainer(TrainerDto trainerDto)
+        {
+            var trainer = new Trainer
+            {
+                TrainerName = trainerDto.TrainerName,
+                TrainerAge = trainerDto.TrainerAge,
+                TrainerBadge = trainerDto.TrainerBadge,
+                TrainerIsGymLeader = trainerDto.TrainerIsGymLeader,
+                TrainerPhotoID = trainerDto.TrainerPhotoID
+            };
 
-//            return CreatedAtAction(nameof(GetAllTrainers), new { id = newTrainer.TrainerID }, newTrainerDto);
-//        }
-//        [HttpDelete("trainers/{id}")]
-//        public async Task<IActionResult> DeleteTrainer(int id)
-//        {
-//            var trainer = await _context.Trainers.FindAsync(id);
+            _context.Trainers.Add(trainer);
+            await _context.SaveChangesAsync();
 
-//            if (trainer == null)
-//            {
-//                return NotFound("Trainer not found.");
-//            }
+            trainerDto.TrainerID = trainer.TrainerID;
 
-//            _context.Trainers.Remove(trainer);
-//            await _context.SaveChangesAsync();
+            return CreatedAtAction("GetTrainer", new { id = trainer.TrainerID }, trainerDto);
+        }
 
-//            return NoContent();
-//        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutTrainer(int id, TrainerDto trainerDto)
+        {
+            if (id != trainerDto.TrainerID)
+            {
+                return BadRequest();
+            }
 
+            var trainer = await _context.Trainers.FindAsync(id);
+            if (trainer == null)
+            {
+                return NotFound();
+            }
 
-//    }
-//}
+            trainer.TrainerName = trainerDto.TrainerName;
+            trainer.TrainerAge = trainerDto.TrainerAge;
+            trainer.TrainerBadge = trainerDto.TrainerBadge;
+            trainer.TrainerIsGymLeader = trainerDto.TrainerIsGymLeader;
+            trainer.TrainerPhotoID = trainerDto.TrainerPhotoID;
+
+            _context.Entry(trainer).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTrainer(int id)
+        {
+            var trainer = await _context.Trainers.FindAsync(id);
+            if (trainer == null)
+            {
+                return NotFound();
+            }
+
+            _context.Trainers.Remove(trainer);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+    }
+}
