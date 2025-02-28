@@ -1,45 +1,67 @@
 export interface Pokemon {
   pokemonID: number;
   pokemonName: string;
-  types: string[];
-  moves: string[];
-  regions: string[];
-  evolutionGroup?: EvolutionGroup;
-  trainer?: Trainer;
-  pokemonPicture: Picture;
+  pokemonPictureID: number | null;
+  pokemonTrainerID: number | null;
+  evolutionGroupID: number | null;
+  pokemonPicture: Picture | null;
+  trainer: Trainer | null;
+  types: PokemonType[];
+  moves: Move[];
+  regions: Region[];
+  evolutionGroup: EvolutionGroup | null;
+  evolutionStages: EvolutionStage[];
 }
 
 export interface UpdatePokemon {
   pokemonName: string;
-  types: string[];
-  moves: string[];
-  regions: string[];
-  evolutionGroup?: EvolutionGroup | null;  
-  trainer?: Trainer | null;               
-  pokemonPicture?: Picture;
+  types: PokemonType[];
+  moves: Move[];
+  regions: Region[];
+  evolutionGroup?: EvolutionGroup | null;
+  trainer?: Trainer | null;
+  pokemonPicture?: Picture | null;
 }
 
-interface EvolutionGroup {
+export interface PokemonType {
+  pokeTypeID: number;
+  typeName: string;
+}
+
+export interface Move {
+  moveID: number;
+  moveName: string;
+  movePower: number;
+  movePP: number;
+  movePokeTypeID: number;
+}
+
+export interface Region {
+  regionID: number;
+  regionName: string;
+  regionDescription: string;
+}
+
+export interface EvolutionGroup {
+  evolutionGroupID: number;
+}
+
+export interface EvolutionStage {
   groupID: number;
-  evolutionStages: EvolutionStage[];
-}
-
-interface EvolutionStage {
   stageOrder: number;
-  pokemon: SimplePokemon;
-}
-
-interface SimplePokemon {
   pokemonID: number;
-  pokemonName: string;
 }
 
-interface Trainer {
+export interface Trainer {
   trainerID: number;
   trainerName: string;
+  trainerAge: number;
+  trainerBadge: number;
+  trainerIsGymLeader: boolean;
+  trainerPhotoID: number;
 }
 
-interface Picture {
+export interface Picture {
   pictureID: number;
   picturePath: string;
 }

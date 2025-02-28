@@ -21,6 +21,7 @@ export class PokemonGridComponent implements OnInit {
   isDrawerOpen = false;
   selectedPokemon: Pokemon | null = null;
   pokemonList$ = new BehaviorSubject<Pokemon[]>([]);
+  pokemonList: Pokemon[] = [];  // To hold the full list of Pokémon for lookup
   isNewPokemon = false;
 
   columns: (string | PokemonGridColumn | DxDataGridTypes.Column)[] = [
@@ -42,28 +43,40 @@ export class PokemonGridComponent implements OnInit {
     {
       dataField: 'types',
       caption: 'Types',
-      calculateCellValue: (rowData: { types?: string[] }) =>
-        (rowData.types || []).join(', ')
+      calculateCellValue: (rowData: Pokemon) => {
+        if(!rowData.types || rowData.types.length === 0) return "No Types Assigned";
+        return rowData.types
+        .map(types => `${types.typeName}`)
+        .join(',')
+      }
     },
     {
       dataField: 'moves',
       caption: 'Moves',
-      calculateCellValue: (rowData: { moves?: string[] }) =>
-        (rowData.moves || []).join(', ')
+      calculateCellValue: (rowData: Pokemon) => {
+        if(!rowData.moves || rowData.moves.length === 0) return "No Moves Assigned";
+        return rowData.moves
+        .map(move => `${move.moveName}`)
+        .join(',')
+        }
     },
     {
       dataField: 'regions',
       caption: 'Regions',
-      calculateCellValue: (rowData: { regions?: string[] }) =>
-        (rowData.regions || []).join(', ')
+      calculateCellValue: (rowData: Pokemon) => {
+        if(!rowData.regions || rowData.regions.length === 0) return "No Regions Assigned";
+        return rowData.regions
+        .map(regions => `${regions.regionName}`)
+        .join(',')
+        }
     },
     {
-      dataField: 'evolutionGroup.evolutionStages',
-      caption: 'Evolution Stages',
-      calculateCellValue: (rowData: { evolutionGroup?: { evolutionStages?: any[] } }) => {
-        if (!rowData.evolutionGroup?.evolutionStages) return 'N/A';
-        return rowData.evolutionGroup.evolutionStages
-          .map(stage => `${stage.stageOrder}: ${stage.pokemon.pokemonName}`)
+      dataField: 'evolutionStages',
+      caption: 'Evolution Stage',
+      calculateCellValue: (rowData: Pokemon) => {
+        if (!rowData.evolutionStages || rowData.evolutionStages.length === 0) return '1';   
+        return rowData.evolutionStages
+          .map(stage => `${stage.stageOrder}`)
           .join(', ');
       }
     },
@@ -96,7 +109,8 @@ export class PokemonGridComponent implements OnInit {
   private loadPokemon() {
     this.pgs.getAllPokemon().subscribe({
       next: (data) => {
-        this.pokemonList$.next(data);
+        this.pokemonList$.next(data);  // Update the observable list
+        this.pokemonList = data;       // Store the full list for lookup
       },
       error: (err) => console.error('Error loading Pokémon:', err)
     });
@@ -112,15 +126,16 @@ export class PokemonGridComponent implements OnInit {
     return {
       pokemonID: 0,
       pokemonName: '',
+      pokemonPictureID: null,
+      pokemonTrainerID: null,
+      evolutionGroupID:  null,
+      pokemonPicture:   null,
+      trainer: null,
       types: [],
       moves: [],
       regions: [],
-      pokemonPicture: { 
-        pictureID: 0, 
-        picturePath: 'assets/default-pokemon.png' 
-      },
-      evolutionGroup: undefined,
-      trainer: undefined
+      evolutionGroup: null,
+      evolutionStages: []
     };
   }
 
