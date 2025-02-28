@@ -66,6 +66,12 @@ namespace Pokemon.Controllers
         [HttpPost]
         public async Task<ActionResult<PokemonFullDto>> CreatePokemonFull(PokemonFullDto pokemonDto)
         {
+            if (pokemonDto.Types.Count == 0)
+                return BadRequest("At least one type is required");
+
+            if (pokemonDto.Moves.Count == 0)
+                return BadRequest("At least one move is required");
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);

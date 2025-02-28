@@ -21,7 +21,7 @@ export class PokemonGridComponent implements OnInit {
   isDrawerOpen = false;
   selectedPokemon: Pokemon | null = null;
   pokemonList$ = new BehaviorSubject<Pokemon[]>([]);
-  pokemonList: Pokemon[] = [];  // To hold the full list of Pokémon for lookup
+  pokemonList: Pokemon[] = [];  
   isNewPokemon = false;
 
   columns: (string | PokemonGridColumn | DxDataGridTypes.Column)[] = [
@@ -47,7 +47,7 @@ export class PokemonGridComponent implements OnInit {
         if(!rowData.types || rowData.types.length === 0) return "No Types Assigned";
         return rowData.types
         .map(types => `${types.typeName}`)
-        .join(',')
+        .join(', ')
       }
     },
     {
@@ -57,7 +57,7 @@ export class PokemonGridComponent implements OnInit {
         if(!rowData.moves || rowData.moves.length === 0) return "No Moves Assigned";
         return rowData.moves
         .map(move => `${move.moveName}`)
-        .join(',')
+        .join(', ')
         }
     },
     {
@@ -67,7 +67,7 @@ export class PokemonGridComponent implements OnInit {
         if(!rowData.regions || rowData.regions.length === 0) return "No Regions Assigned";
         return rowData.regions
         .map(regions => `${regions.regionName}`)
-        .join(',')
+        .join(', ')
         }
     },
     {

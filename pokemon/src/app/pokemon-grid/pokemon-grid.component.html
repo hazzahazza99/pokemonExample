@@ -8,6 +8,7 @@
   [filterRow]="{ visible: true }"
   [searchPanel]="{ visible: true }"
   [showBorders]="true"
+  [hoverStateEnabled]="true"
   (onRowClick)="openDrawer($event.data)">
   
   <dxo-editing mode="popup"></dxo-editing>
@@ -59,8 +60,14 @@
         [validationRules]="[{ type: 'required', message: 'Pokémon name is required' }]">
       </dxi-item>
       
-      <dxi-item dataField="types"></dxi-item>
-      <dxi-item dataField="moves"></dxi-item>
+      <dxi-item 
+        dataField="types"
+        [validationRules]="[{ type: 'required', message: 'At least one Type is required' }]"
+      ></dxi-item>
+      <dxi-item 
+        dataField="moves"
+        [validationRules]="[{ type: 'required', message: 'At least one Move is required' }]"
+      ></dxi-item>
       <dxi-item dataField="regions"></dxi-item>
       
       <dxi-item

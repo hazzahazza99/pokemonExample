@@ -1,8 +1,11 @@
-﻿namespace Pokemon.Dtos
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Pokemon.Dtos
 {
     public class PokeTypeDto
     {
         public int PokeTypeID { get; set; }
-        public string TypeName { get; set; }
+        [Required]
+        public string TypeName { get; set; } = string.Empty;
     }
 }
