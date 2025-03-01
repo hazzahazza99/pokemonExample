@@ -3,9 +3,10 @@
 https://dbdiagram.io/d/Pokemondb-67bdaa7e263d6cf9a062cc16
 
 ### Overview:
-A simple angular application :)
+A simple angular application for managing Pokemon data, attributes and relationships
 
-### Features
+### Features:
+
 - Angular frontend (HTML / SCSS / TS) using Devextreme components and the RxJS library
 
 - Backend (ASP.NET Core / C#)
