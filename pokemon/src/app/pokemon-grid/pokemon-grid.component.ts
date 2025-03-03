@@ -162,14 +162,6 @@ export class PokemonGridComponent implements OnInit {
     };
   }
 
-  private validateForm(): boolean {
-    if (!this.selectedPokemon?.pokemonName?.trim()) {
-      alert('Pokémon name is required');
-      return false;
-    }
-    return true;
-  }
-
   private initializeNewPokemon(): Pokemon {
     return {
       pokemonID: 0,

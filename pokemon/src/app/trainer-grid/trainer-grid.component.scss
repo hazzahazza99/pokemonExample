@@ -1,0 +1,30 @@
+/* trainer-grid.component.scss */
+::ng-deep .dx-drawer-panel-content {
+    z-index: 1001;
+    background: white;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.15);
+    transform: translateZ(0);
+    
+    .drawer-content {
+      padding: 20px;
+      height: calc(100vh - 40px);
+      overflow-y: auto;
+      
+      .dx-form {
+        margin-top: 20px;
+      }
+    }
+  }
+  
+  ::ng-deep .dx-drawer-content {
+    overflow: visible !important;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .trainer-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
