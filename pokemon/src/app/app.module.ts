@@ -18,7 +18,10 @@ import { TypesListComponent } from './types-list/types-list.component';
     TrainerGridComponent,
     TopbarComponent,
     MovesGridComponent,
-    TypesListComponent
+    TypesListComponent,
+
+    
+
   ],
   imports: [
     BrowserModule,

@@ -4,6 +4,10 @@ import { Pokemon, UpdatePokemon } from '../models/pokemon.model';
 import { PokemonGridService } from '../services/pokemon-grid.service';
 import { confirm } from 'devextreme/ui/dialog';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import { PokemonTypeService } from '../services/types-list.service';
+import { PokemonMoveService } from '../services/moves-grid.service';
+import { PokemonType } from '../models/pokemon-type.model';
+import { Move } from '../models/move.model';
 
 interface PokemonGridColumn extends DxDataGridTypes.Column {
   dataField: string;
@@ -21,7 +25,11 @@ export class PokemonGridComponent implements OnInit {
   isDrawerOpen = false;
   selectedPokemon: Pokemon | null = null;
   pokemonList$ = new BehaviorSubject<Pokemon[]>([]);
-  pokemonList: Pokemon[] = [];  
+  types$ = new BehaviorSubject<PokemonType[]>([]);
+  moves$ = new BehaviorSubject<Move[]>([]);
+  pokemonList: Pokemon[] = []; 
+  types: PokemonType[] =[];
+  moves: Move[] = []; 
   isNewPokemon = false;
 
   columns: (string | PokemonGridColumn | DxDataGridTypes.Column)[] = [
@@ -100,26 +108,66 @@ export class PokemonGridComponent implements OnInit {
     }
   ];
 
-  constructor(private pgs: PokemonGridService) {}
+  constructor(private pgs: PokemonGridService, private typeserv: PokemonTypeService, private moveserv: PokemonMoveService) {}
 
   ngOnInit(): void {
     this.loadPokemon();
+    this.loadTypes();
+    this.loadMoves();
   }
 
   private loadPokemon() {
     this.pgs.getAllPokemon().subscribe({
       next: (data) => {
-        this.pokemonList$.next(data);  // Update the observable list
-        this.pokemonList = data;       // Store the full list for lookup
+        this.pokemonList$.next(data);  
+        this.pokemonList = data;       
+      },
+      error: (err) => console.error('Error loading Pokémon:', err)
+    });
+  }
+  private loadTypes() {
+    this.typeserv.getAllTypes().subscribe({
+      next: (data) => {
+        this.types$.next(data);  
+        this.types = data;       
+      },
+      error: (err) => console.error('Error loading Pokémon:', err)
+    });
+  }
+  private loadMoves() {
+    this.moveserv.getAllMoves().subscribe({
+      next: (data) => {
+        this.moves$.next(data);  
+        this.moves = data;       
       },
       error: (err) => console.error('Error loading Pokémon:', err)
     });
   }
 
-  openDrawer(pokemon?: Pokemon) {
-    this.isNewPokemon = !pokemon;
-    this.selectedPokemon = pokemon ? { ...pokemon } : this.initializeNewPokemon();
-    this.isDrawerOpen = true;
+  private prepareSelectedPokemon(pokemon: Pokemon): Pokemon {
+    const selectedPokemon = { ...pokemon };
+    selectedPokemon.types = pokemon.types.map(type => this.types.find(t => t.pokeTypeID === type.pokeTypeID)!);
+    selectedPokemon.moves = pokemon.moves.map(move => this.moves.find(m => m.moveID === move.moveID)!);
+    return selectedPokemon;
+  }
+  private convertToUpdateDto(pokemon: Pokemon): UpdatePokemon {
+    return {
+      pokemonName: pokemon.pokemonName,
+      types: pokemon.types,
+      moves: pokemon.moves,
+      regions: pokemon.regions,
+      evolutionGroup: pokemon.evolutionGroup || null,
+      trainer: pokemon.trainer || null,
+      pokemonPicture: pokemon.pokemonPicture
+    };
+  }
+
+  private validateForm(): boolean {
+    if (!this.selectedPokemon?.pokemonName?.trim()) {
+      alert('Pokémon name is required');
+      return false;
+    }
+    return true;
   }
 
   private initializeNewPokemon(): Pokemon {
@@ -149,9 +197,13 @@ export class PokemonGridComponent implements OnInit {
     }
   }
 
-  saveChanges() {
-    if (!this.validateForm()) return;
-  
+  openDrawer(pokemon?: Pokemon) {
+    this.isNewPokemon = !pokemon;
+    this.selectedPokemon = pokemon ? this.prepareSelectedPokemon(pokemon) : this.initializeNewPokemon();
+    this.isDrawerOpen = true;
+  }
+
+  saveChanges() {  
     const operation = this.isNewPokemon 
       ? this.pgs.createPokemon(this.selectedPokemon!)
       : this.pgs.updatePokemon(this.selectedPokemon!.pokemonID, this.convertToUpdateDto(this.selectedPokemon!));
@@ -163,26 +215,6 @@ export class PokemonGridComponent implements OnInit {
       },
       error: (err) => console.error('Error saving Pokémon:', err)
     });
-  }
-  
-  private convertToUpdateDto(pokemon: Pokemon): UpdatePokemon {
-    return {
-      pokemonName: pokemon.pokemonName,
-      types: pokemon.types,
-      moves: pokemon.moves,
-      regions: pokemon.regions,
-      evolutionGroup: pokemon.evolutionGroup || null,
-      trainer: pokemon.trainer || null,
-      pokemonPicture: pokemon.pokemonPicture
-    };
-  }
-
-  private validateForm(): boolean {
-    if (!this.selectedPokemon?.pokemonName?.trim()) {
-      alert('Pokémon name is required');
-      return false;
-    }
-    return true;
   }
 
   closeDrawer() {

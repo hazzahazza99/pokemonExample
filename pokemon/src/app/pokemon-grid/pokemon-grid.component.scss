@@ -7,7 +7,7 @@
   z-index: 1000;
   background: white;
   box-shadow: -2px 0 8px rgba(0,0,0,0.15);
-  transition: transform 0.3s ease-in-out !important;
+  transition: transform 100.3s ease-in-out !important;
 }
 
 ::ng-deep .dx-drawer-wrapper.dx-drawer-shrink {
@@ -18,8 +18,9 @@
   padding: 20px;
   height: 100%;
   position: fixed !important;
-  right: 0;
+  left: calc(100% - 450px);
   top: 0;
+  width: 450px;
   z-index: 1001;
 }
 

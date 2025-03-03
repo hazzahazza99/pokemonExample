@@ -1,5 +1,5 @@
 <dx-data-grid
-  [dataSource]="pokemonList$ | async"  
+  [dataSource]="pokemonList"  
   [keyExpr]="'pokemonID'"
   [columns]="columns"
   [allowColumnResizing]="true"
@@ -54,35 +54,46 @@
       [formData]="selectedPokemon"
       [colCount]="2"
       [showValidationSummary]="true">
-
       <dxi-item 
-        dataField="pokemonName" 
+      dataField="pokemonName" 
         [validationRules]="[{ type: 'required', message: 'Pokémon name is required' }]">
       </dxi-item>
-      
       <dxi-item 
         dataField="types"
-        displayExpr="name"
+        editorType="dxTagBox"
+        [editorOptions]="{
+          dataSource: types$ | async,
+          displayExpr: 'typeName',
+          keyExpr: 'typeID',
+          searchEnabled: true,
+          showSelectionControls: true,
+          applyValueMode: 'useButtons'
+        }"
         [validationRules]="[{ type: 'required', message: 'At least one Type is required' }]"
       ></dxi-item>
+
       <dxi-item 
         dataField="moves"
-        displayExpr="movename"
+        editorType="dxTagBox"
+        [editorOptions]="{
+          dataSource: moves$ | async,
+          displayExpr: 'moveName',
+          keyExpr: 'moveID',
+          searchEnabled: true,
+          showSelectionControls: true,
+          applyValueMode: 'useButtons'
+        }"
         [validationRules]="[{ type: 'required', message: 'At least one Move is required' }]"
       ></dxi-item>
-      <dxi-item 
-        dataField="regions"
-        displayExpr="regionName"
-      ></dxi-item>
-      <dxi-item 
-        dataField="evolutionStages"
-        displayExpr="stageName"
-      ></dxi-item>
-      
-      <dxi-item
-        dataField="evolutionGroup"
-        caption="Evolution Group ID">
-      </dxi-item>
+
+    <dxi-item
+      dataField="regions"
+      caption="Regions">
+    </dxi-item>      
+    <dxi-item
+      dataField="evolutionStages"
+      caption="Evolution Stages">
+    </dxi-item>
       
       <dxi-item>
         <dx-button 

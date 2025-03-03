@@ -28,7 +28,6 @@ export class MovesGridComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadMoves();
-    this.loadTypes();
   }
 
   loadMoves(): void {
