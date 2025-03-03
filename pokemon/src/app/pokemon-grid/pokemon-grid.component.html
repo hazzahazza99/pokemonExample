@@ -62,24 +62,26 @@
       
       <dxi-item 
         dataField="types"
+        displayExpr="name"
         [validationRules]="[{ type: 'required', message: 'At least one Type is required' }]"
       ></dxi-item>
       <dxi-item 
         dataField="moves"
+        displayExpr="movename"
         [validationRules]="[{ type: 'required', message: 'At least one Move is required' }]"
       ></dxi-item>
-      <dxi-item dataField="regions"></dxi-item>
+      <dxi-item 
+        dataField="regions"
+        displayExpr="regionName"
+      ></dxi-item>
+      <dxi-item 
+        dataField="evolutionStages"
+        displayExpr="stageName"
+      ></dxi-item>
       
       <dxi-item
-        dataField="evolutionGroup.evolutionStages"
-        caption="Evolution Stages"
-        [editorOptions]="{ disabled: true }">
-        <div *dxTemplate="let data of 'content'">
-          <div *ngFor="let stage of data.component.option('formData').evolutionGroup?.evolutionStages || []" 
-              class="evolution-stage">
-            Stage {{ stage.stageOrder }}: {{ stage.pokemon.pokemonName }}
-          </div>
-        </div>
+        dataField="evolutionGroup"
+        caption="Evolution Group ID">
       </dxi-item>
       
       <dxi-item>

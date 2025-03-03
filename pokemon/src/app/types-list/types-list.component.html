@@ -1,0 +1,9 @@
+<dx-data-grid
+  id="typesGrid"
+  [dataSource]="types"
+  [showBorders]="true"
+  [columnAutoWidth]="true"
+  keyExpr="pokeTypeID">
+  <dxi-column dataField="pokeTypeID" caption="ID" [alignment]="'left'"></dxi-column>
+  <dxi-column dataField="typeName" caption="Name"></dxi-column>
+</dx-data-grid>

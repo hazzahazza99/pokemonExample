@@ -1,0 +1,38 @@
+<div class="move-grid-container">
+    <dx-data-grid
+      id="movesGrid"
+      [dataSource]="moves"
+      [showBorders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [rowAlternationEnabled]="true"
+      keyExpr="moveID">
+      
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager [showInfo]="true" [showNavigationButtons]="true"></dxo-pager>
+      <dxo-search-panel [visible]="true"></dxo-search-panel>
+      <dxo-filter-row [visible]="true"></dxo-filter-row>  
+      <dxi-column dataField="moveID" caption="ID"></dxi-column>
+      <dxi-column dataField="moveName" caption="Name"></dxi-column>
+      <dxi-column 
+          dataField="movePokeType.typeName" 
+          caption="Type"
+          [allowSorting]="true"
+          [allowFiltering]="true">
+      </dxi-column>
+      <dxi-column 
+          dataField="movePower" 
+          caption="Power"
+          dataType="number"
+          [alignment]="'left'"
+          [format]="{ type: 'decimal', precision: 0 }">
+      </dxi-column>
+      <dxi-column 
+          dataField="movePP" 
+          caption="PP"
+          dataType="number"
+          [alignment]="'left'"
+          [format]="{ type: 'decimal', precision: 0 }">
+      </dxi-column>
+    </dx-data-grid>
+</div>

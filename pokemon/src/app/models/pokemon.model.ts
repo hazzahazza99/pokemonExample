@@ -1,3 +1,11 @@
+import { EvolutionGroup } from "./evolution-group.model";
+import { EvolutionStage } from "./evolution-stage.model";
+import { Move } from "./move.model";
+import { Picture } from "./picture.model";
+import { PokemonType } from "./pokemon-type.model";
+import { Region } from "./region.model";
+import { Trainer } from "./trainer.model";
+
 export interface Pokemon {
   pokemonID: number;
   pokemonName: string;
@@ -21,47 +29,4 @@ export interface UpdatePokemon {
   evolutionGroup?: EvolutionGroup | null;
   trainer?: Trainer | null;
   pokemonPicture?: Picture | null;
-}
-
-export interface PokemonType {
-  pokeTypeID: number;
-  typeName: string;
-}
-
-export interface Move {
-  moveID: number;
-  moveName: string;
-  movePower: number;
-  movePP: number;
-  movePokeTypeID: number;
-}
-
-export interface Region {
-  regionID: number;
-  regionName: string;
-  regionDescription: string;
-}
-
-export interface EvolutionGroup {
-  evolutionGroupID: number;
-}
-
-export interface EvolutionStage {
-  groupID: number;
-  stageOrder: number;
-  pokemonID: number;
-}
-
-export interface Trainer {
-  trainerID: number;
-  trainerName: string;
-  trainerAge: number;
-  trainerBadge: number;
-  trainerIsGymLeader: boolean;
-  trainerPhotoID: number;
-}
-
-export interface Picture {
-  pictureID: number;
-  picturePath: string;
 }
