@@ -209,15 +209,22 @@ export class PokemonGridComponent implements OnInit {
     selectedPokemon.pokemonTrainerID = pokemon.trainer?.trainerID || null;
     return selectedPokemon;
   }
-  private convertToUpdateDto(pokemon: Pokemon): UpdatePokemon {
+  private convertToUpdateDto(pokemon: Pokemon): any {
     return {
       pokemonName: pokemon.pokemonName,
-      types: pokemon.types,
-      moves: pokemon.moves,
-      regions: pokemon.regions,
-      evolutionGroup: pokemon.evolutionGroup,
-      trainer: pokemon.trainer,
-      pokemonPicture: pokemon.pokemonPicture
+      pokemonPictureID: pokemon.pokemonPictureID ?? null,
+      pokemonTrainerID: pokemon.pokemonTrainerID ?? null,
+      evolutionGroupID: pokemon.evolutionGroupID ?? null,
+      types: pokemon.types.map(type => ({
+        pokeTypeID: type.pokeTypeID,
+      })),
+      moves: pokemon.moves.map(move => ({
+        moveID: move.moveID,
+      })),
+      regions: pokemon.regions.map(region => ({
+        regionID: region.regionID,
+      })),
+      evolutionStages: pokemon.evolutionStages
     };
   }
 
@@ -255,9 +262,11 @@ export class PokemonGridComponent implements OnInit {
   }
 
   saveChanges() {  
+    const dto = this.convertToUpdateDto(this.selectedPokemon!);
+  
     const operation = this.isNewPokemon 
-      ? this.pgs.createPokemon(this.selectedPokemon!)
-      : this.pgs.updatePokemon(this.selectedPokemon!.pokemonID, this.convertToUpdateDto(this.selectedPokemon!));
+      ? this.pgs.createPokemon(dto as Pokemon) // Cast only if necessary
+      : this.pgs.updatePokemon(this.selectedPokemon!.pokemonID, dto);
   
     operation.subscribe({
       next: () => {

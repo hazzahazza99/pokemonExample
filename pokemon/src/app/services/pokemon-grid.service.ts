@@ -21,11 +21,13 @@ export class PokemonGridService {
   }
 
   createPokemon(pokemon: Pokemon): Observable<Pokemon> {
-    return this.http.post<Pokemon>(this.apiUrl, pokemon);
+    const payload = { pokemonDto: pokemon };
+    return this.http.post<Pokemon>(`${this.apiUrl}`, payload);
   }
 
-  updatePokemon(id: number, updatedData: UpdatePokemon): Observable<Pokemon> {
-    return this.http.put<Pokemon>(`${this.apiUrl}/${id}`, updatedData);
+  updatePokemon(id: number, pokemon: UpdatePokemon): Observable<Pokemon> {
+    const payload = { pokemonDto: pokemon };
+    return this.http.put<Pokemon>(`${this.apiUrl}/${id}`, payload);
   }
 
   deletePokemon(id: number): Observable<void> {

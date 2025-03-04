@@ -23,10 +23,11 @@ export interface Pokemon {
 
 export interface UpdatePokemon {
   pokemonName: string;
-  types: PokemonType[];
-  moves: Move[];
-  regions: Region[];
-  evolutionGroup?: EvolutionGroup | null;
-  trainer?: Trainer | null;
-  pokemonPicture?: Picture | null;
+  pokemonPictureID: number | null;
+  pokemonTrainerID: number | null;
+  evolutionGroupID: number | null;
+  types: Array<{ pokeTypeID: number }>; // Or PokeTypeDto if more fields needed
+  moves: Array<{ moveID: number }>;
+  regions: Array<{ regionID: number }>;
+  evolutionStages: EvolutionStage[];
 }
