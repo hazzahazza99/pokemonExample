@@ -8,6 +8,8 @@ import { PokemonTypeService } from '../services/types-list.service';
 import { PokemonMoveService } from '../services/moves-grid.service';
 import { PokemonType } from '../models/pokemon-type.model';
 import { Move } from '../models/move.model';
+import { Region } from '../models/region.model';
+import { RegionsService } from '../services/regions.service';
 
 interface PokemonGridColumn extends DxDataGridTypes.Column {
   dataField: string;
@@ -27,9 +29,11 @@ export class PokemonGridComponent implements OnInit {
   pokemonList$ = new BehaviorSubject<Pokemon[]>([]);
   types$ = new BehaviorSubject<PokemonType[]>([]);
   moves$ = new BehaviorSubject<Move[]>([]);
+  regions$ = new BehaviorSubject<Region[]>([]);
   pokemonList: Pokemon[] = []; 
   types: PokemonType[] =[];
   moves: Move[] = []; 
+  regions: Region[] =[]
   isNewPokemon = false;
 
   columns: (string | PokemonGridColumn | DxDataGridTypes.Column)[] = [
@@ -108,12 +112,18 @@ export class PokemonGridComponent implements OnInit {
     }
   ];
 
-  constructor(private pgs: PokemonGridService, private typeserv: PokemonTypeService, private moveserv: PokemonMoveService) {}
+  constructor(
+    private pgs: PokemonGridService, 
+    private typeserv: PokemonTypeService,
+    private moveserv: PokemonMoveService,
+    private regserv: RegionsService
+  ) {}
 
   ngOnInit(): void {
     this.loadPokemon();
     this.loadTypes();
     this.loadMoves();
+    this.loadRegions();
   }
 
   private loadPokemon() {
@@ -125,6 +135,7 @@ export class PokemonGridComponent implements OnInit {
       error: (err) => console.error('Error loading Pokémon:', err)
     });
   }
+
   private loadTypes() {
     this.typeserv.getAllTypes().subscribe({
       next: (data) => {
@@ -134,6 +145,7 @@ export class PokemonGridComponent implements OnInit {
       error: (err) => console.error('Error loading Pokémon:', err)
     });
   }
+
   private loadMoves() {
     this.moveserv.getAllMoves().subscribe({
       next: (data) => {
@@ -144,10 +156,21 @@ export class PokemonGridComponent implements OnInit {
     });
   }
 
+  private loadRegions() {
+    this.regserv.getAllRegions().subscribe({
+      next: (data) => {
+        this.regions$.next(data);  
+        this.regions = data;       
+      },
+      error: (err) => console.error('Error loading Pokémon:', err)
+    });
+  }
+
   private prepareSelectedPokemon(pokemon: Pokemon): Pokemon {
     const selectedPokemon = { ...pokemon };
     selectedPokemon.types = pokemon.types.map(type => this.types.find(t => t.pokeTypeID === type.pokeTypeID)!);
     selectedPokemon.moves = pokemon.moves.map(move => this.moves.find(m => m.moveID === move.moveID)!);
+    selectedPokemon.regions = pokemon.regions.map(regions => this.regions.find(m => m.regionID === regions.regionID)!);
     return selectedPokemon;
   }
   private convertToUpdateDto(pokemon: Pokemon): UpdatePokemon {

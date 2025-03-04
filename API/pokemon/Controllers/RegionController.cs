@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pokemon.Data;
 using Pokemon.Dtos;
+using Pokemon.Models;
 
 namespace Pokemon.Controllers
 {
@@ -30,5 +31,21 @@ namespace Pokemon.Controllers
 
             return Ok(regions);
         }
+
+
+        [HttpPost]
+        public async Task<ActionResult<RegionDto>> CreateRegion(RegionDto regionDto)
+        {
+            if (await _context.Regions.AnyAsync(m => m.RegionName == regionDto.RegionName))
+                return BadRequest("Region with this name already exists");
+
+            var region = _mapper.Map<Region>(regionDto);
+
+            _context.Regions.Add(region);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetAllRegions), _mapper.Map<RegionDto>(region));
+        }
     }
 }
+
