@@ -64,35 +64,38 @@
         [editorOptions]="{
           dataSource: types$ | async,
           displayExpr: 'typeName',
-          valueExpr: 'typeID',
+          valueExpr: 'pokeTypeID',
           searchEnabled: true,
           showSelectionControls: true,
           applyValueMode: 'useButtons',
           itemTemplate: 'typeItemTemplate',
           tagTemplate: 'typeTagTemplate'
         }"
-        [validationRules]="[{ type: 'required', message: 'At least one Type is required' }]"
-      ></dxi-item>
-
-      <div *dxTemplate="let data of 'typeItemTemplate'">
-        <div class="custom-item">
-          <img 
-            [src]="'http://localhost:4200/images/icons/Pokemon_Type_Icon_' + data.typeName + '.png'"
-            [alt]="data.typeName + ' icon'"
-            class="type-icon"
-          />
-          <span>{{ data.typeName }}</span>
+        >
+        <dxi-validation-rule
+          type="custom"
+          [validationCallback]="validateTypeSelection"
+          message="You must select 1 or 2 types">
+        </dxi-validation-rule>    </dxi-item>
+        <div *dxTemplate="let type of 'typeItemTemplate'">
+          <div class="custom-item">
+            <img 
+              [src]="baseUrl + '/images/icons/Pokemon_Type_Icon_' + type.typeName + '.png'"
+              [alt]="type.typeName + ' icon'"
+              class="type-icon"
+            />
+            <span>{{ type.typeName }}</span>
+          </div>
         </div>
-      </div>
 
-      <div *dxTemplate="let data of 'typeTagTemplate'">
-        <div class="custom-tag">
-          <img 
-            [src]="'http://localhost:4200/images/icons/Pokemon_Type_Icon_' + data.typeName + '.png'"
-            [alt]="data.typeName + ' icon'"
-            class="tag-icon"
-          />
-          {{ data.typeName }}
+      <div *dxTemplate="let cell of 'typeTagTemplate'">
+          <div class="custom-tag">
+            <img 
+              [src]="baseUrl + '/images/icons/Pokemon_Type_Icon_' + cell.typeName + '.png'"
+              [alt]="cell.typeName + ' icon'"
+              class="tag-icon"
+            />
+          </div>
         </div>
       </div>
       <dxi-item 
@@ -118,12 +121,39 @@
             searchEnabled: true,
             showSelectionControls: true,
             applyValueMode: 'useButtons'
-          }"
-          [validationRules]="[{ type: 'required', message: 'At least one Region is required' }]"
+          }">
+          <dxi-validation-rule
+            type="custom"
+            [validationCallback]="validateMoveSelection"
+            message="You must select between 1 and 4 Moves">
+          </dxi-validation-rule>     
+    </dxi-item>
+
+      <dxi-item 
+        dataField="pokemonTrainerID"
+        editorType="dxSelectBox"
+        [editorOptions]="{
+          dataSource: trainers$ | async,
+          displayExpr: 'trainerName',
+          valueExpr: 'trainerID',
+          searchEnabled: true,
+          showClearButton: true,
+          placeholder: 'Wild Pokémon'
+        }"
       ></dxi-item>  
-    <dxi-item
-      dataField="evolutionStages"
-      caption="Evolution Stages">
+   <dxi-item
+        [disabled]="true"
+        dataField="evolutionStages"
+        editorType="dxTagBox"
+        [editorOptions]="{
+          dataSource: evolutionStages$ | async,
+          displayExpr: 'groupID',
+          valueExpr: 'stageOrder',
+          searchEnabled: true,
+          showSelectionControls: true,
+          applyValueMode: 'useButtons',
+          placeholder: 'Basic Pokémon'
+        }">
     </dxi-item>
       
       <dxi-item>
