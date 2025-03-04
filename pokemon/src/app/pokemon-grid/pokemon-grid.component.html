@@ -97,7 +97,6 @@
             />
           </div>
         </div>
-      </div>
       <dxi-item 
         dataField="moves"
         editorType="dxTagBox"
@@ -141,19 +140,18 @@
           placeholder: 'Wild Pokémon'
         }"
       ></dxi-item>  
-   <dxi-item
-        [disabled]="true"
-        dataField="evolutionStages"
-        editorType="dxTagBox"
-        [editorOptions]="{
-          dataSource: evolutionStages$ | async,
-          displayExpr: 'groupID',
-          valueExpr: 'stageOrder',
-          searchEnabled: true,
-          showSelectionControls: true,
-          applyValueMode: 'useButtons',
-          placeholder: 'Basic Pokémon'
-        }">
+      <dxi-item
+      dataField="selectedStageOrders"
+      editorType="dxTagBox"
+      [editorOptions]="{
+        dataSource: evolutionStages$ | async,
+        displayExpr: 'stageOrder',
+        valueExpr: 'stageOrder',
+        searchEnabled: true,
+        showSelectionControls: true,
+        applyValueMode: 'useButtons',
+        placeholder: 'Basic Pokémon'
+      }">
     </dxi-item>
       
       <dxi-item>

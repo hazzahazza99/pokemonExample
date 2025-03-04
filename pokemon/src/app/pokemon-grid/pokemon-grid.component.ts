@@ -1,3 +1,12 @@
+import { Component, OnInit } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { Pokemon, UpdatePokemon } from '../models/pokemon.model';
+import { PokemonGridService } from '../services/pokemon-grid.service';
+import { confirm } from 'devextreme/ui/dialog';
+import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import { PokemonTypeService } from '../services/types-list.service';
+import { PokemonMoveService } from '../services/moves-grid.service';
+import { PokemonType } from '../models/pokemon-type.model';
 import { Move } from '../models/move.model';
 import { Region } from '../models/region.model';
 import { RegionsService } from '../services/regions.service';
@@ -9,10 +18,17 @@ import { EvolutionStageService } from '../services/evolution-stage.service';
 
 interface PokemonGridColumn extends DxDataGridTypes.Column {
   dataField: string;
+  caption: string;
+  calculateCellValue?: (rowData: any) => string;
+  cellTemplate?: string;
+}
 
-@@ -24,16 +29,21 @@ interface PokemonGridColumn extends DxDataGridTypes.Column {
+@Component({
+  selector: 'app-pokemon-grid',
+  templateUrl: './pokemon-grid.component.html',
   styleUrls: ['./pokemon-grid.component.scss']
 })
+
 export class PokemonGridComponent implements OnInit {
   baseUrl = environment.baseUrl
   isDrawerOpen = false;
@@ -26,7 +42,6 @@ export class PokemonGridComponent implements OnInit {
   pokemonList: Pokemon[] = []; 
   types: PokemonType[] =[];
   moves: Move[] = []; 
-  regions: Region[] =[];
   regions: Region[] =[];
   trainers: Trainer[] =[];
   evolutionStages: EvolutionStage[] = [];
@@ -194,15 +209,15 @@ export class PokemonGridComponent implements OnInit {
     selectedPokemon.pokemonTrainerID = pokemon.trainer?.trainerID || null;
     return selectedPokemon;
   }
-  private convertToUpdateDto(pokemon: any): UpdatePokemon {
+  private convertToUpdateDto(pokemon: Pokemon): UpdatePokemon {
     return {
-      pokemonName: formData.pokemonName,
-      types: formData.types.map((id: number) => this.types.find(t => t.pokeTypeID === id)!),
-      moves: formData.moves.map((id: number) => this.moves.find(m => m.moveID === id)!),
-      regions: formData.regions.map((id: number) => this.regions.find(r => r.regionID === id)!),
-      evolutionGroup: formData.evolutionGroup,
-      trainer: formData.trainer,
-      pokemonPicture: formData.pokemonPicture
+      pokemonName: pokemon.pokemonName,
+      types: pokemon.types,
+      moves: pokemon.moves,
+      regions: pokemon.regions,
+      evolutionGroup: pokemon.evolutionGroup,
+      trainer: pokemon.trainer,
+      pokemonPicture: pokemon.pokemonPicture
     };
   }
 
@@ -212,8 +227,8 @@ export class PokemonGridComponent implements OnInit {
       pokemonName: '',
       pokemonPictureID: null,
       pokemonTrainerID: null,
-      evolutionGroupID:  null,
-      pokemonPicture:   null,
+      evolutionGroupID: null,
+      pokemonPicture: null,
       trainer: null,
       types: [],
       moves: [],
