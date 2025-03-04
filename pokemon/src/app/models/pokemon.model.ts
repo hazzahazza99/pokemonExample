@@ -13,7 +13,7 @@ export interface Pokemon {
   pokemonTrainerID: number | null;
   evolutionGroupID: number | null;
   pokemonPicture: Picture | null;
-  trainer: Trainer | null;
+  trainer?: Trainer | null;
   types: PokemonType[];
   moves: Move[];
   regions: Region[];
