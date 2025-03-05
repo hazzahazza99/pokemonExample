@@ -1,7 +1,6 @@
 <dx-data-grid
-  [dataSource]="pokemonList"  
+  [dataSource]="pokemonList$ | async"
   [keyExpr]="'pokemonID'"
-  [columns]="columns"
   [allowColumnResizing]="true"
   [columnAutoWidth]="true"
   [paging]="{ pageSize: 10 }"
@@ -10,9 +9,9 @@
   [showBorders]="true"
   [hoverStateEnabled]="true"
   (onRowClick)="openDrawer($event.data)">
-  
+
   <dxo-editing mode="popup"></dxo-editing>
-  
+
   <dxo-toolbar>
     <dxi-item location="before">
       <dx-button
@@ -22,6 +21,26 @@
       </dx-button>
     </dxi-item>
   </dxo-toolbar>
+
+  <dxi-column dataField="pokemonID" caption="ID" [width]="100"></dxi-column>
+
+  <dxi-column dataField="pokemonName" caption="Pokemon Name"></dxi-column>
+
+  <dxi-column caption="Trainer" [calculateCellValue]="getTrainerName"></dxi-column>
+  
+  <dxi-column caption="Types" [calculateCellValue]="getTypesName"></dxi-column>
+
+  <dxi-column caption="Moves" [calculateCellValue]="getMovesName"></dxi-column>
+
+  <dxi-column caption="Regions" [calculateCellValue]="getRegionsName"></dxi-column>
+
+  <dxi-column caption="Evolution Stage"[calculateCellValue]="getEvolutionStageID"></dxi-column>
+
+  <dxi-column dataField="pokemonPicture.picturePath" caption="Image" cellTemplate="imageTemplate"></dxi-column>
+
+  <dxi-column type="buttons" [width]="100">
+    <dxi-button text="Delete" (onClick)="deletePokemon($event)"></dxi-button>
+  </dxi-column>
 
   <div *dxTemplate="let data of 'imageTemplate'">
     <img [src]="data.value" width="50" height="50" alt="Pokemon Image">
@@ -64,7 +83,7 @@
         [editorOptions]="{
           dataSource: types$ | async,
           displayExpr: 'typeName',
-          valueExpr: 'pokeTypeID',
+          keyExpr: 'pokeTypeID',
           searchEnabled: true,
           showSelectionControls: true,
           applyValueMode: 'useButtons',
@@ -140,19 +159,6 @@
           placeholder: 'Wild Pokémon'
         }"
       ></dxi-item>  
-      <dxi-item
-      dataField="selectedStageOrders"
-      editorType="dxTagBox"
-      [editorOptions]="{
-        dataSource: evolutionStages$ | async,
-        displayExpr: 'stageOrder',
-        valueExpr: 'stageOrder',
-        searchEnabled: true,
-        showSelectionControls: true,
-        applyValueMode: 'useButtons',
-        placeholder: 'Basic Pokémon'
-      }">
-    </dxi-item>
       
       <dxi-item>
         <dx-button 

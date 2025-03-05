@@ -40,53 +40,53 @@
   <div *dxTemplate="let data of 'panel'">
     <div class="drawer-content" [hidden]="!selectedTrainer">
         <div *ngIf="selectedTrainer">
-      <h3>{{ isNewTrainer ? 'Add New' : 'Edit' }} Trainer</h3>
-      
-      <dx-form
-        [formData]="selectedTrainer"
-        [colCount]="1"
-        [showValidationSummary]="true">
-        
-        <dxi-item 
-          dataField="trainerName"
-          caption="Name"
-          [validationRules]="[{ type: 'required', message: 'Name is required' }]">
-        </dxi-item>
-        
-        <dxi-item 
-          dataField="trainerAge"
-          caption="Age"
-          editorType="dxNumberBox"
-          [editorOptions]="{ min: 10, max: 100 }">
-        </dxi-item>
-        
-        <dxi-item 
-          dataField="trainerBadge"
-          caption="Badges"
-          editorType="dxNumberBox"
-          [editorOptions]="{ min: 0, max: 8 }">
-        </dxi-item>
-        
-        <dxi-item 
-          dataField="trainerIsGymLeader"
-          caption="Gym Leader"
-          editorType="dxCheckBox">
-        </dxi-item>
-        
-        <dxi-item>
-          <dx-button 
-            text="Save" 
-            type="success" 
-            (onClick)="saveTrainer()">
-          </dx-button>
-          <dx-button 
-            text="Cancel" 
-            type="danger" 
-            (onClick)="closeDrawer()">
-          </dx-button>
-        </dxi-item>
-      </dx-form>
-    </div>
+            <h3>{{ isNewTrainer ? 'Add New' : 'Edit' }} Trainer</h3>
+            
+            <dx-form
+                [formData]="selectedTrainer"
+                [colCount]="1"
+                [showValidationSummary]="true">
+                
+                <dxi-item 
+                dataField="trainerName"
+                caption="Name"
+                [validationRules]="[{ type: 'required', message: 'Name is required' }]">
+                </dxi-item>
+                
+                <dxi-item 
+                dataField="trainerAge"
+                caption="Age"
+                editorType="dxNumberBox"
+                [editorOptions]="{ min: 10, max: 100 }">
+                </dxi-item>
+                
+                <dxi-item n
+                dataField="trainerBadge"
+                caption="Badges"
+                editorType="dxNumberBox"
+                [editorOptions]="{ min: 0, max: 8 }">
+                </dxi-item>
+                
+                <dxi-item 
+                dataField="trainerIsGymLeader"
+                caption="Gym Leader"
+                editorType="dxCheckBox">
+                </dxi-item>
+                
+                <dxi-item>
+                <dx-button 
+                    text="Save" 
+                    type="success" 
+                    (onClick)="saveTrainer()">
+                </dx-button>
+                <dx-button 
+                    text="Cancel" 
+                    type="danger" 
+                    (onClick)="closeDrawer()">
+                </dx-button>
+                </dxi-item>
+            </dx-form>
+        </div>
     </div>
   </div>
 </dx-drawer>

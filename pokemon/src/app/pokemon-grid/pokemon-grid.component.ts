@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Pokemon, UpdatePokemon } from '../models/pokemon.model';
+import { Pokemon, PokemonFullDto, PokemonRequest } from '../models/pokemon.model';
 import { PokemonGridService } from '../services/pokemon-grid.service';
 import { confirm } from 'devextreme/ui/dialog';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
@@ -13,8 +13,6 @@ import { RegionsService } from '../services/regions.service';
 import { environment } from '../env/environment';
 import { TrainerGridService } from '../services/trainer-grid.service';
 import { Trainer } from '../models/trainer.model';
-import { EvolutionStage } from '../models/evolution-stage.model';
-import { EvolutionStageService } from '../services/evolution-stage.service';
 
 interface PokemonGridColumn extends DxDataGridTypes.Column {
   dataField: string;
@@ -38,90 +36,12 @@ export class PokemonGridComponent implements OnInit {
   moves$ = new BehaviorSubject<Move[]>([]);
   regions$ = new BehaviorSubject<Region[]>([]);
   trainers$ = new BehaviorSubject<Trainer[]>([]);
-  evolutionStages$ = new BehaviorSubject<EvolutionStage[]>([]);
-  pokemonList: Pokemon[] = []; 
   types: PokemonType[] =[];
   moves: Move[] = []; 
   regions: Region[] =[];
   trainers: Trainer[] =[];
-  evolutionStages: EvolutionStage[] = [];
   isNewPokemon = false;
 
-  columns: (string | PokemonGridColumn | DxDataGridTypes.Column)[] = [
-    { 
-      dataField: 'pokemonID', 
-      caption: 'ID', 
-      width: 100 
-    },
-    { 
-      dataField: 'pokemonName', 
-      caption: 'Pokemon Name' 
-    },
-    { 
-      dataField: 'trainer.trainerName', 
-      caption: 'Trainer',
-      calculateCellValue: (rowData: { trainer?: { trainerName?: string } }) => 
-        rowData.trainer?.trainerName || 'Wild Pokemon'
-    },
-    {
-      dataField: 'types',
-      caption: 'Types',
-      calculateCellValue: (rowData: Pokemon) => {
-        if(!rowData.types || rowData.types.length === 0) return "No Types Assigned";
-        return rowData.types
-        .map(types => `${types.typeName}`)
-        .join(', ')
-      }
-    },
-    {
-      dataField: 'moves',
-      caption: 'Moves',
-      calculateCellValue: (rowData: Pokemon) => {
-        if(!rowData.moves || rowData.moves.length === 0) return "No Moves Assigned";
-        return rowData.moves
-        .map(move => `${move.moveName}`)
-        .join(', ')
-        }
-    },
-    {
-      dataField: 'regions',
-      caption: 'Regions',
-      calculateCellValue: (rowData: Pokemon) => {
-        if(!rowData.regions || rowData.regions.length === 0) return "No Regions Assigned";
-        return rowData.regions
-        .map(regions => `${regions.regionName}`)
-        .join(', ')
-        }
-    },
-    {
-      dataField: 'evolutionStages',
-      caption: 'Evolution Stage',
-      calculateCellValue: (rowData: Pokemon) => {
-        if (!rowData.evolutionStages || rowData.evolutionStages.length === 0) return '1';   
-        return rowData.evolutionStages
-          .map(stage => `${stage.stageOrder}`)
-          .join(', ');
-      }
-    },
-    {
-      dataField: 'pokemonPicture.picturePath',
-      caption: 'Image',
-      cellTemplate: 'imageTemplate'
-    },
-    {
-      type: 'buttons',
-      width: 100,
-      buttons: [{
-        text: 'Delete',
-        onClick: async (e: DxDataGridTypes.ColumnButtonClickEvent) => {
-          const pokemonId = e.row?.data.pokemonID;
-          if (pokemonId) {
-            await this.deletePokemon(pokemonId);
-          }
-        }
-      }] as DxDataGridTypes.ColumnButton[]
-    }
-  ];
 
   constructor(
     private pgs: PokemonGridService, 
@@ -129,7 +49,6 @@ export class PokemonGridComponent implements OnInit {
     private moveserv: PokemonMoveService,
     private regserv: RegionsService,
     private trs: TrainerGridService,
-    private ess: EvolutionStageService,
   ) {}
 
   ngOnInit(): void {
@@ -138,14 +57,12 @@ export class PokemonGridComponent implements OnInit {
     this.loadMoves();
     this.loadRegions();
     this.loadTrainers();
-    this.loadEvolutionstages();
   }
 
   private loadPokemon() {
     this.pgs.getAllPokemon().subscribe({
       next: (data) => {
-        this.pokemonList$.next(data);  
-        this.pokemonList = data;       
+        this.pokemonList$.next(data);       
       },
       error: (err) => console.error('Error loading Pokémon:', err)
     });
@@ -154,30 +71,40 @@ export class PokemonGridComponent implements OnInit {
   private loadTypes() {
     this.typeserv.getAllTypes().subscribe({
       next: (data) => {
-        this.types$.next(data);  
-        this.types = data;       
-      },
-      error: (err) => console.error('Error loading Pokémon:', err)
+        this.types = data.map(t => ({
+          pokeTypeID: t.pokeTypeID,
+          typeName: t.typeName,
+        }));
+        this.types$.next(this.types);
+      }
     });
   }
-
+  
   private loadMoves() {
     this.moveserv.getAllMoves().subscribe({
       next: (data) => {
-        this.moves$.next(data);  
-        this.moves = data;       
-      },
-      error: (err) => console.error('Error loading Pokémon:', err)
+        this.moves = data.map(m => ({
+          moveID: m.moveID,
+          moveName: m.moveName,
+          movePower: m.movePower,
+          movePP: m.movePP,
+          movePokeTypeID: m.movePokeTypeID
+        }));
+        this.moves$.next(this.moves);
+      }
     });
   }
-
+  
   private loadRegions() {
     this.regserv.getAllRegions().subscribe({
       next: (data) => {
-        this.regions$.next(data);  
-        this.regions = data;       
-      },
-       error: (err) => console.error('Error loading regions', err)
+        this.regions = data.map(r => ({
+          regionID: r.regionID,
+          regionName: r.regionName,
+          regionDescription: r.regionDescription
+        }));
+        this.regions$.next(this.regions);
+      }
     });
   }
 
@@ -191,16 +118,6 @@ export class PokemonGridComponent implements OnInit {
     });
   }
 
-  private loadEvolutionstages(){
-    this.ess.getAllEvolutionStages().subscribe({
-      next: (data) => {
-        this.evolutionStages$.next(data);  
-        this.evolutionStages = data;       
-      },
-      error: (err) => console.error('Error loading Evo stages:', err)
-    });
-  }
-
   private prepareSelectedPokemon(pokemon: Pokemon): Pokemon {
     const selectedPokemon = { ...pokemon };
     selectedPokemon.types = pokemon.types.map(type => this.types.find(t => t.pokeTypeID === type.pokeTypeID)!);
@@ -209,22 +126,35 @@ export class PokemonGridComponent implements OnInit {
     selectedPokemon.pokemonTrainerID = pokemon.trainer?.trainerID || null;
     return selectedPokemon;
   }
-  private convertToUpdateDto(pokemon: Pokemon): any {
+  
+  private convertToDto(pokemon: Pokemon): PokemonFullDto {
     return {
+      pokemonID: pokemon.pokemonID,
       pokemonName: pokemon.pokemonName,
-      pokemonPictureID: pokemon.pokemonPictureID ?? null,
-      pokemonTrainerID: pokemon.pokemonTrainerID ?? null,
-      evolutionGroupID: pokemon.evolutionGroupID ?? null,
-      types: pokemon.types.map(type => ({
-        pokeTypeID: type.pokeTypeID,
+      pokemonPictureID: pokemon.pokemonPictureID || undefined,
+      pokemonTrainerID: pokemon.pokemonTrainerID || undefined,
+      evolutionGroupID: pokemon.evolutionGroupID || undefined,
+      types: pokemon.types.map(t => ({
+        pokeTypeID: t.pokeTypeID,
+        typeName: t.typeName 
       })),
-      moves: pokemon.moves.map(move => ({
-        moveID: move.moveID,
+      moves: pokemon.moves.map(m => ({
+        moveID: m.moveID,
+        moveName: m.moveName, 
+        movePower: m.movePower,
+        movePP: m.movePP,
+        movePokeTypeID: m.movePokeTypeID
       })),
-      regions: pokemon.regions.map(region => ({
-        regionID: region.regionID,
+      regions: pokemon.regions.map(r => ({
+        regionID: r.regionID,
+        regionName: r.regionName, 
+        regionDescription: r.regionDescription 
       })),
-      evolutionStages: pokemon.evolutionStages
+      evolutionStages: pokemon.evolutionStages?.map(s => ({
+        groupID: s.groupID,
+        stageOrder: s.stageOrder,
+        pokemonID: s.pokemonID
+      })) || []
     };
   }
 
@@ -241,11 +171,12 @@ export class PokemonGridComponent implements OnInit {
       moves: [],
       regions: [],
       evolutionGroup: null,
-      evolutionStages: [{ groupID: 0, stageOrder: 1, pokemonID: 0 }]
+      evolutionStages: []
     };
   }
 
-  async deletePokemon(pokemonId: number) {
+  async deletePokemon(event: any) {
+    const pokemonId = event.row.data.pokemonID;
     const result = await confirm('Are you sure?', 'Delete Pokémon');
     if (result) {
       this.pgs.deletePokemon(pokemonId).subscribe({
@@ -259,23 +190,33 @@ export class PokemonGridComponent implements OnInit {
     this.isNewPokemon = !pokemon;
     this.selectedPokemon = pokemon ? this.prepareSelectedPokemon(pokemon) : this.initializeNewPokemon();
     this.isDrawerOpen = true;
+    console.log(this.selectedPokemon)
   }
 
   saveChanges() {  
-    const dto = this.convertToUpdateDto(this.selectedPokemon!);
-  
-    const operation = this.isNewPokemon 
-      ? this.pgs.createPokemon(dto as Pokemon) // Cast only if necessary
-      : this.pgs.updatePokemon(this.selectedPokemon!.pokemonID, dto);
-  
-    operation.subscribe({
-      next: () => {
-        this.loadPokemon();
-        this.closeDrawer();
-      },
-      error: (err) => console.error('Error saving Pokémon:', err)
-    });
+    const dto = this.convertToDto(this.selectedPokemon!);
+    const requestBody: PokemonRequest = { pokemonDto: dto };
+
+    
+    if (this.isNewPokemon) {
+      this.pgs.createPokemon(dto).subscribe({
+        next: () => {
+          this.loadPokemon();
+          this.closeDrawer();
+        },
+        error: (err) => console.error('Create failed:', err)
+      });
+    } else {
+      this.pgs.updatePokemon(dto.pokemonID!, dto).subscribe({
+        next: () => {
+          this.loadPokemon();
+          this.closeDrawer();
+        },
+        error: (err) => console.error('Update failed:', err)
+      });
+    }
   }
+
 
   closeDrawer() {
     this.isDrawerOpen = false;
@@ -297,5 +238,34 @@ export class PokemonGridComponent implements OnInit {
   validateTypeSelection(e: any) {
     const selectedTypes = e.value;
     return selectedTypes && selectedTypes.length >= 1 && selectedTypes.length <= 2;
+  }
+
+
+  getTrainerName(rowData: Pokemon): string {
+    return rowData?.trainer?.trainerName || 'Wild Pokemon';
+  }
+
+  getTypesName(rowData: Pokemon): string {
+    return rowData.types?.length 
+      ? rowData.types.map(t => t?.typeName || 'Unknown').join(', ') 
+      : 'No Types Assigned';
+  }
+  
+  getMovesName(rowData: Pokemon): string {
+    return rowData.moves?.length 
+      ? rowData.moves.map(m => m.moveName).join(', ') 
+      : 'No Moves Assigned';
+  }
+  
+  getRegionsName(rowData: Pokemon): string {
+    return rowData.regions?.length 
+      ? rowData.regions.map(r => r.regionName).join(', ') 
+      : 'No Regions Assigned';
+  }
+  
+  getEvolutionStageID(rowData: Pokemon): string {
+    return rowData.evolutionStages?.length 
+      ? rowData.evolutionStages.map(s => s.stageOrder).join(', ') 
+      : '1';
   }
 }
