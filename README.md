@@ -18,3 +18,5 @@ A simple angular application for managing Pokemon data, attributes and relations
 - DTO's with AutoMapper
 
 - SQL Server database (MSSQL server)
+
+- Database seed included
