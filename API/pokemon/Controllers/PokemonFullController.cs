@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pokemon.Data;
@@ -33,7 +32,7 @@ namespace Pokemon.Controllers
                 .Include(p => p.PokemonTypes).ThenInclude(pt => pt.PokeType)
                 .Include(p => p.Moves).ThenInclude(m => m.Move)
                 .Include(p => p.Regions).ThenInclude(r => r.Region)
-                .Include(p => p.EvolutionGroup).ThenInclude(eg => eg.EvolutionStages).ThenInclude(es => es.Pokemon)
+                .Include(p => p.EvolutionGroup).ThenInclude(eg => eg.EvolutionStages)
                 .FirstOrDefaultAsync(p => p.PokemonID == id);
 
             if (pokemon == null)
@@ -52,11 +51,11 @@ namespace Pokemon.Controllers
                 .Include(p => p.PokemonTypes).ThenInclude(pt => pt.PokeType)
                 .Include(p => p.Moves).ThenInclude(m => m.Move)
                 .Include(p => p.Regions).ThenInclude(r => r.Region)
-                .Include(p => p.EvolutionGroup).ThenInclude(eg => eg.EvolutionStages).ThenInclude(es => es.Pokemon)
+                .Include(p => p.EvolutionGroup).ThenInclude(eg => eg.EvolutionStages)
                 .AsSplitQuery()
                 .ToListAsync();
 
-            if (pokemonList == null || !pokemonList.Any())
+            if (!pokemonList.Any())
                 return NotFound();
 
             var pokemonDtos = _mapper.Map<List<PokemonFullDto>>(pokemonList);
@@ -66,11 +65,8 @@ namespace Pokemon.Controllers
         [HttpPost]
         public async Task<ActionResult<PokemonFullDto>> CreatePokemonFull(PokemonFullDto pokemonDto)
         {
-            if (pokemonDto.Types.Count == 0)
-                return BadRequest("At least one type is required");
-
-            if (pokemonDto.Moves.Count == 0)
-                return BadRequest("At least one move is required");
+            if (!pokemonDto.Types.Any() || !pokemonDto.Moves.Any())
+                return BadRequest("At least one type and move is required.");
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -79,26 +75,19 @@ namespace Pokemon.Controllers
 
             try
             {
-                var pokemon = new PokemonData
-                {
-                    PokemonName = pokemonDto.PokemonName,
-                    PokemonPictureID = pokemonDto.PokemonPictureID,
-                    PokemonTrainerID = pokemonDto.PokemonTrainerID,
-                    EvolutionGroupID = pokemonDto.EvolutionGroupID
-                };
-
+                var pokemon = _mapper.Map<PokemonData>(pokemonDto);
                 _context.Pokemon.Add(pokemon);
                 await _context.SaveChangesAsync();
 
                 await ProcessRelationships(pokemon, pokemonDto);
 
                 await transaction.CommitAsync();
-                return CreatedAtAction(nameof(GetPokemonFull), new { id = pokemon.PokemonID }, pokemonDto);
+                return CreatedAtAction(nameof(GetPokemonFull), new { id = pokemon.PokemonID }, _mapper.Map<PokemonFullDto>(pokemon));
             }
-            catch (Exception ex)
+            catch
             {
                 await transaction.RollbackAsync();
-                return StatusCode(500, "Error creating Pokémon" + ex.InnerException?.Message);
+                return StatusCode(500, "Error creating Pokémon.");
             }
         }
 
@@ -113,24 +102,23 @@ namespace Pokemon.Controllers
                     .Include(p => p.PokemonTypes)
                     .Include(p => p.Moves)
                     .Include(p => p.Regions)
+                    .Include(p => p.EvolutionGroup).ThenInclude(eg => eg.EvolutionStages)
                     .FirstOrDefaultAsync(p => p.PokemonID == id);
 
                 if (existingPokemon == null)
                     return NotFound();
 
                 _mapper.Map(pokemonDto, existingPokemon);
-
                 await ProcessRelationships(existingPokemon, pokemonDto);
-
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 return NoContent();
             }
-            catch (Exception ex)
+            catch
             {
                 await transaction.RollbackAsync();
-                return StatusCode(500, "Error updating Pokemon" + ex.InnerException?.Message);
+                return StatusCode(500, "Error updating Pokémon.");
             }
         }
 
@@ -138,11 +126,6 @@ namespace Pokemon.Controllers
         public async Task<IActionResult> DeletePokemonFull(int id)
         {
             var pokemon = await _context.Pokemon
-                .Include(p => p.PokemonPicture)
-                .Include(p => p.Trainer)
-                .Include(p => p.PokemonTypes)
-                .Include(p => p.Moves)
-                .Include(p => p.Regions)
                 .Include(p => p.EvolutionGroup)
                 .FirstOrDefaultAsync(p => p.PokemonID == id);
 
@@ -157,50 +140,34 @@ namespace Pokemon.Controllers
 
         private async Task ProcessRelationships(PokemonData pokemon, PokemonFullDto dto)
         {
-            foreach (var typeDto in dto.Types)
+            _context.PokemonTypes.RemoveRange(_context.PokemonTypes.Where(pt => pt.TypesPokemonID == pokemon.PokemonID));
+            _context.Movesets.RemoveRange(_context.Movesets.Where(m => m.MovesetPokemonID == pokemon.PokemonID));
+            _context.PokemonRegions.RemoveRange(_context.PokemonRegions.Where(r => r.RegionsPokemonID == pokemon.PokemonID));
+            await _context.SaveChangesAsync();
+
+            _context.PokemonTypes.AddRange(dto.Types.Select(typeDto => new PokemonType { TypesPokemonID = pokemon.PokemonID, TypesPokeTypeID = typeDto.PokeTypeID }));
+            _context.Movesets.AddRange(dto.Moves.Select(moveDto => new Moveset { MovesetPokemonID = pokemon.PokemonID, MovesetMoveID = moveDto.MoveID }));
+            _context.PokemonRegions.AddRange(dto.Regions.Select(regionDto => new PokemonRegion { RegionsPokemonID = pokemon.PokemonID, RegionsRegionID = regionDto.RegionID }));
+
+            if (dto.EvolutionStages != null)
             {
-                var pokemonType = new PokemonType
+                var existingStages = await _context.EvolutionStages.Where(es => es.PokemonID == pokemon.PokemonID).ToListAsync();
+                _context.EvolutionStages.RemoveRange(existingStages);
+                await _context.SaveChangesAsync();
+
+                foreach (var evolutionStageDto in dto.EvolutionStages)
                 {
-                    TypesPokemonID = pokemon.PokemonID,
-                    TypesPokeTypeID = typeDto.PokeTypeID
-                };
-                _context.PokemonTypes.Add(pokemonType);
+                    _context.EvolutionStages.Add(new EvolutionStage
+                    {
+                        PokemonID = pokemon.PokemonID,
+                        GroupID = evolutionStageDto.GroupID,
+                        StageOrder = evolutionStageDto.StageOrder
+                    });
+                }
             }
-
-            foreach (var moveDto in dto.Moves)
-            {
-                var pokemonMove = new Moveset
-                {
-                    MovesetPokemonID = pokemon.PokemonID,
-                    MovesetMoveID = moveDto.MoveID
-                };
-                _context.Movesets.Add(pokemonMove);
-            }
-
-            foreach (var regionDto in dto.Regions)
-            {
-                var pokemonRegion = new PokemonRegion
-                {
-                    RegionsPokemonID = pokemon.PokemonID,
-                    RegionsRegionID = regionDto.RegionID
-                };
-                _context.PokemonRegions.Add(pokemonRegion);
-            }
-
-            /*foreach (var evolutionDto in dto.EvolutionStages)
-            {
-                var evolutionStage = new EvolutionStage
-                {
-                    GroupID = evolutionDto.GroupID,
-                    StageOrder = evolutionDto.StageOrder,
-                    PokemonID = pokemon.PokemonID
-                };
-
-                _context.EvolutionStages.Add(evolutionStage);
-            }*/
-
 
             await _context.SaveChangesAsync();
         }
+
     }
 }

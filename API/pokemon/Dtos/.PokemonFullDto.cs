@@ -23,5 +23,5 @@ public class PokemonFullDto
     public List<RegionDto> Regions { get; set; } = new();
 
     public EvolutionGroupDto? EvolutionGroup { get; set; }
-    public List<EvolutionStageDto> EvolutionStages { get; set; } = new();
+    public List<EvolutionStageDto>? EvolutionStages { get; set; } = new();
 }
