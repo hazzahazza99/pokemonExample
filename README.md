@@ -1,6 +1,7 @@
 # PokemonExample
 ## An Angular / C# Learning Project
-https://dbdiagram.io/d/Pokemondb-67bdaa7e263d6cf9a062cc16
+
+![image](https://github.com/user-attachments/assets/1692a723-79e6-402b-8c0e-cf706f4667c8)
 
 ### Overview:
 A simple angular application for managing Pokemon data, attributes and relationships
