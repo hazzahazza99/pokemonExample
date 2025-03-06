@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Pokemon.Data;
+using Pokemon.Services;
+using Pokemon.Services.Interfaces;
 
 
 
@@ -23,6 +25,12 @@ builder.Services.AddCors(options =>
         policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200");
     });
 });
+
+builder.Services.AddScoped<ITypeService, TypeService>();
+builder.Services.AddScoped<IMoveService, MoveService>();
+builder.Services.AddScoped<IRegionService, RegionService>();
+builder.Services.AddScoped<ITrainerService, TrainerService>();
+builder.Services.AddScoped<ICommonService, CommonService>();
 
 var app = builder.Build();
 

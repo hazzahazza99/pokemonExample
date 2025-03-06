@@ -9,65 +9,57 @@
   [showBorders]="true"
   [hoverStateEnabled]="true"
   (onRowClick)="openDrawer($event.data)">
-
-  <dxo-toolbar>
-    <dxi-item location="before">
-      <dx-button
+	<dxo-editing mode="popup"></dxo-editing>
+	<dxo-toolbar>
+		<dxi-item location="before">
+			<dx-button
         icon="plus"
         text="Add New Pokémon"
-        (onClick)="openDrawer()">
-      </dx-button>
-    </dxi-item>
-  </dxo-toolbar>
-
-  <dxi-column dataField="pokemonID" caption="ID" [width]="100"></dxi-column>
-  <dxi-column dataField="pokemonName" caption="Pokemon Name"></dxi-column>
-  <dxi-column caption="Trainer" [calculateCellValue]="getTrainerName"></dxi-column>
-  <dxi-column caption="Types" [calculateCellValue]="getTypesName"></dxi-column>
-  <dxi-column caption="Moves" [calculateCellValue]="getMovesName"></dxi-column>
-  <dxi-column caption="Regions" [calculateCellValue]="getRegionsName"></dxi-column>
-  <dxi-column caption="Evolution Stage" [calculateCellValue]="getEvolutionStageID"></dxi-column>
-  <dxi-column dataField="pokemonPicture.picturePath" caption="Image" cellTemplate="imageTemplate"></dxi-column>
-
-  <dxi-column type="buttons" [width]="100">
-    <dxi-button text="Delete" [onClick]="deletePokemon.bind(this)"></dxi-button>
-  </dxi-column>
-
-  <div *dxTemplate="let data of 'imageTemplate'">
-    <img [src]="data.value" width="50" height="50" alt="Pokemon Image">
-  </div>
-</dx-data-grid>
-
-<dx-drawer
+        (onClick)="openDrawer()"></dx-button>
+		</dxi-item>
+	</dxo-toolbar>
+	<dxi-column dataField="pokemonID" caption="ID" [width]="100"></dxi-column>
+	<dxi-column dataField="pokemonName" caption="Pokemon Name"></dxi-column>
+	<dxi-column caption="Trainer" [calculateCellValue]="getTrainerName"></dxi-column>
+	<dxi-column caption="Types" [calculateCellValue]="getTypesName"></dxi-column>
+	<dxi-column caption="Moveset" [calculateCellValue]="getMovesName"></dxi-column>
+	<dxi-column caption="Regions" [calculateCellValue]="getRegionsName"></dxi-column>
+	<dxi-column caption="Evolution Stage"[calculateCellValue]="getEvolutionStageID"></dxi-column>
+	<dxi-column dataField="pokemonPicture.picturePath" caption="Image" cellTemplate="imageTemplate"></dxi-column>
+	<dxi-column type="buttons" [width]="100">
+		<dxi-button text="Delete" [onClick]="deletePokemon.bind(this)"></dxi-button>
+	</dxi-column>
+	<div *dxTemplate="let data of 'imageTemplate'">
+		<img [src]="data.value" width="50" height="50" alt="Pokemon Image">
+		</div>
+	</dx-data-grid>
+	<dx-drawer
   [opened]="isDrawerOpen"
   [height]="'100vh'"
   [position]="'right'"
   [revealMode]="'slide'"
+  [shading]="false"
   [width]="'30%'"
+  [animationEnabled]="true"
   (onOptionChanged)="handleDrawerClose($event)">
-
-  <div *ngIf="selectedPokemon" class="drawer-content">
-    <h3>{{ isNewPokemon ? 'Add New' : 'Edit' }} Pokémon</h3>
-    
-    <div class="pokemon-image-container">
-      <img 
+		<div *ngIf="selectedPokemon" class="drawer-content">
+			<h3>{{ isNewPokemon ? 'Add New' : 'Edit' }} Pokémon</h3>
+			<div class="pokemon-image-container">
+				<img 
         [src]="selectedPokemon.pokemonPicture?.picturePath" 
         width="100" 
         height="100" 
         alt="Pokemon Image"
       />
-    </div>
-
-    <dx-form
+			</div>
+			<dx-form
       [formData]="selectedPokemon"
       [colCount]="2"
       [showValidationSummary]="true">
-      <dxi-item 
-        dataField="pokemonName" 
-        [validationRules]="[{ type: 'required', message: 'Pokémon name is required' }]">
-      </dxi-item>
-      
-      <dxi-item 
+				<dxi-item 
+      dataField="pokemonName" 
+        [validationRules]="[{ type: 'required', message: 'Pokémon name is required' }]"></dxi-item>
+				<dxi-item 
         dataField="types"
         editorType="dxTagBox"
         [editorOptions]="{
@@ -75,39 +67,37 @@
           displayExpr: 'typeName',
           keyExpr: 'pokeTypeID',
           searchEnabled: true,
+          showSelectionControls: true,
           applyValueMode: 'useButtons',
           itemTemplate: 'typeItemTemplate',
           tagTemplate: 'typeTagTemplate'
-        }">
-        <dxi-validation-rule
+        }"
+        >
+					<dxi-validation-rule
           type="custom"
           [validationCallback]="validateTypeSelection"
-          message="You must select 1 or 2 types">
-        </dxi-validation-rule>
-      </dxi-item>
-
-      <div *dxTemplate="let type of 'typeItemTemplate'">
-        <div class="custom-item">
-          <img 
-            [src]="baseUrl + '/images/icons/Pokemon_Type_Icon_' + type.typeName + '.png'"
-            [alt]="type.typeName + ' icon'"
-            class="type-icon"
-          />
-          <span>{{ type.typeName }}</span>
-        </div>
-      </div>
-
-      <div *dxTemplate="let cell of 'typeTagTemplate'">
-        <div class="custom-tag">
-          <img 
-            [src]="baseUrl + '/images/icons/Pokemon_Type_Icon_' + cell.typeName + '.png'"
-            [alt]="cell.typeName + ' icon'"
-            class="tag-icon"
-          />
-        </div>
-      </div>
-
-      <dxi-item 
+          message="You must select 1 or 2 types"></dxi-validation-rule>
+				</dxi-item>
+				<div *dxTemplate="let type of 'typeItemTemplate'">
+					<div class="custom-item">
+						<img 
+              [src]="baseUrl + '/images/icons/Pokemon_Type_Icon_' + type.typeName + '.png'"
+              [alt]="type.typeName + ' icon'"
+              class="type-icon"
+            />
+						<span>{{ type.typeName }}</span>
+					</div>
+				</div>
+				<div *dxTemplate="let cell of 'typeTagTemplate'">
+					<div class="custom-tag">
+						<img 
+              [src]="baseUrl + '/images/icons/Pokemon_Type_Icon_' + cell.typeName + '.png'"
+              [alt]="cell.typeName + ' icon'"
+              class="tag-icon"
+            />
+					</div>
+				</div>
+				<dxi-item 
         dataField="moves"
         editorType="dxTagBox"
         [editorOptions]="{
@@ -115,24 +105,28 @@
           displayExpr: 'moveName',
           keyExpr: 'moveID',
           searchEnabled: true,
+          showSelectionControls: true,
           applyValueMode: 'useButtons'
         }"
-        [validationRules]="[{ type: 'required', message: 'At least one Move is required' }]">
-      </dxi-item>
-
-      <dxi-item
+        [validationRules]="[{ type: 'required', message: 'At least one Move is required' }]"
+      ></dxi-item>
+				<dxi-item
         dataField="regions"
         editorType="dxTagBox"
-        [editorOptions]="{
-          dataSource: regions$ | async,
-          displayExpr: 'regionName',
-          keyExpr: 'regionID',
-          searchEnabled: true,
-          applyValueMode: 'useButtons'
-        }">
-      </dxi-item>
-
-      <dxi-item 
+          [editorOptions]="{
+            dataSource: regions$ | async,
+            displayExpr: 'regionName',
+            keyExpr: 'regionID',
+            searchEnabled: true,
+            showSelectionControls: true,
+            applyValueMode: 'useButtons'
+          }">
+					<dxi-validation-rule
+            type="custom"
+            [validationCallback]="validateMoveSelection"
+            message="You must select between 1 and 4 Moves"></dxi-validation-rule>
+				</dxi-item>
+				<dxi-item 
         dataField="pokemonTrainerID"
         editorType="dxSelectBox"
         [editorOptions]="{
@@ -140,22 +134,20 @@
           displayExpr: 'trainerName',
           valueExpr: 'trainerID',
           searchEnabled: true,
+          showClearButton: true,
           placeholder: 'Wild Pokémon'
-        }">
-      </dxi-item>  
-
-      <dxi-item>
-        <dx-button 
+        }"
+      ></dxi-item>
+				<dxi-item>
+					<dx-button 
           text="Save" 
           type="success" 
-          (onClick)="saveChanges()">
-        </dx-button>
-        <dx-button 
+          (onClick)="saveChanges()"></dx-button>
+					<dx-button 
           text="Cancel" 
           type="danger" 
-          (onClick)="closeDrawer()">
-        </dx-button>
-      </dxi-item>
-    </dx-form>
-  </div>
-</dx-drawer>
+          (onClick)="closeDrawer()"></dx-button>
+				</dxi-item>
+			</dx-form>
+		</div>
+	</dx-drawer>
