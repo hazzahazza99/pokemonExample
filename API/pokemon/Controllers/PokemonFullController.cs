@@ -73,9 +73,7 @@ namespace Pokemon.Controllers
                 return BadRequest("At least one move is required");
 
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -117,7 +115,8 @@ namespace Pokemon.Controllers
                     .Include(p => p.Regions)
                     .FirstOrDefaultAsync(p => p.PokemonID == id);
 
-                if (existingPokemon == null) return NotFound();
+                if (existingPokemon == null)
+                    return NotFound();
 
                 _mapper.Map(pokemonDto, existingPokemon);
 
@@ -131,7 +130,7 @@ namespace Pokemon.Controllers
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return StatusCode(500, "Error updating Pokemon");
+                return StatusCode(500, "Error updating Pokemon" + ex.InnerException?.Message);
             }
         }
 
@@ -148,9 +147,7 @@ namespace Pokemon.Controllers
                 .FirstOrDefaultAsync(p => p.PokemonID == id);
 
             if (pokemon == null)
-            {
                 return NotFound();
-            }
 
             _context.Pokemon.Remove(pokemon);
             await _context.SaveChangesAsync();
@@ -190,50 +187,57 @@ namespace Pokemon.Controllers
             }
 
             if (dto.EvolutionGroupID.HasValue)
-            {
-                await UpdateEvolutionGroup(pokemon.PokemonID, dto.EvolutionGroupID.Value, dto.EvolutionStages);
-            }
+                await UpdateEvolutionGroupIfChanged(dto.EvolutionGroupID.Value, dto.EvolutionStages);
 
             await _context.SaveChangesAsync();
         }
+
         private async Task ClearRelationships(int pokemonId)
         {
-            var types = await _context.PokemonTypes
-                .Where(pt => pt.TypesPokemonID == pokemonId)
-                .ToListAsync();
+            var types = await _context.PokemonTypes.Where(pt => pt.TypesPokemonID == pokemonId).ToListAsync();
             _context.PokemonTypes.RemoveRange(types);
 
-            var moves = await _context.Movesets
-                .Where(m => m.MovesetPokemonID == pokemonId)
-                .ToListAsync();
+            var moves = await _context.Movesets.Where(m => m.MovesetPokemonID == pokemonId).ToListAsync();
             _context.Movesets.RemoveRange(moves);
 
-            var regions = await _context.PokemonRegions
-                .Where(pr => pr.RegionsPokemonID == pokemonId)
-                .ToListAsync();
+            var regions = await _context.PokemonRegions.Where(pr => pr.RegionsPokemonID == pokemonId).ToListAsync();
             _context.PokemonRegions.RemoveRange(regions);
 
             await _context.SaveChangesAsync();
         }
 
-        private async Task UpdateEvolutionGroup(int pokemonId, int groupId, List<EvolutionStageDto> stages)
+        private async Task UpdateEvolutionGroupIfChanged(int groupId, List<EvolutionStageDto> dtoStages)
         {
             var group = await _context.EvolutionGroups
                 .Include(g => g.EvolutionStages)
                 .FirstOrDefaultAsync(g => g.EvolutionGroupID == groupId);
+            if (group == null)
+                return;
 
-            if (group == null) return;
+            var uniqueDtoStages = dtoStages.GroupBy(s => s.StageOrder).Select(g => g.First()).ToList();
+            var currentStages = group.EvolutionStages.ToDictionary(es => es.StageOrder);
 
-            group.EvolutionStages.Clear();
-            foreach (var stage in stages)
+            foreach (var dtoStage in uniqueDtoStages)
             {
-                group.EvolutionStages.Add(new EvolutionStage
+                if (currentStages.TryGetValue(dtoStage.StageOrder, out var existingStage))
                 {
-                    GroupID = groupId,
-                    StageOrder = stage.StageOrder,
-                    PokemonID = stage.PokemonID
-                });
+                    if (existingStage.PokemonID != dtoStage.PokemonID)
+                        existingStage.PokemonID = dtoStage.PokemonID;
+                    currentStages.Remove(dtoStage.StageOrder);
+                }
+                else
+                {
+                    group.EvolutionStages.Add(new EvolutionStage
+                    {
+                        GroupID = groupId,
+                        StageOrder = dtoStage.StageOrder,
+                        PokemonID = dtoStage.PokemonID
+                    });
+                }
             }
+
+            if (currentStages.Any())
+                _context.EvolutionStages.RemoveRange(currentStages.Values);
 
             await _context.SaveChangesAsync();
         }

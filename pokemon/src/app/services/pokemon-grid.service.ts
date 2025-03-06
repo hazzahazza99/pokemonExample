@@ -2,7 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../env/environment';
-import { Pokemon, PokemonFullDto } from '../models/pokemon.model';
+import { Pokemon } from '../models/pokemon.model';
+import { PokemonUpdateDto } from '../models/dtos.model';
+
 
 @Injectable({
   providedIn: 'root'
@@ -20,13 +22,16 @@ export class PokemonGridService {
     return this.http.get<Pokemon>(`${this.apiUrl}/${id}`);
   }
 
-  createPokemon(pokemon: PokemonFullDto): Observable<PokemonFullDto> {
-    return this.http.post<PokemonFullDto>(`${this.apiUrl}`, pokemon);
+  createPokemon(pokemon: Pokemon): Observable<Pokemon> {
+    return this.http.post<Pokemon>(`${this.apiUrl}`, pokemon);
   }
   
-  updatePokemon(id: number, pokemon: PokemonFullDto): Observable<PokemonFullDto> {
-    return this.http.put<PokemonFullDto>(`${this.apiUrl}/${id}`, pokemon);
+  updatePokemon(id: number, dto: PokemonUpdateDto): Observable<Pokemon> {
+    return this.http.put<Pokemon>(
+      `${this.apiUrl}/${id}`, dto
+    );
   }
+
 
   deletePokemon(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);

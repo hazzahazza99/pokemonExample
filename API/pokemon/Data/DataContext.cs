@@ -73,6 +73,10 @@ namespace Pokemon.Data
                 .HasForeignKey(es => es.PokemonID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<EvolutionStage>()
+                .HasIndex(es => new { es.GroupID, es.StageOrder })
+                .IsUnique();
+
             modelBuilder.Entity<Moveset>()
                 .HasOne(ms => ms.Pokemon)
                 .WithMany(p => p.Moves)

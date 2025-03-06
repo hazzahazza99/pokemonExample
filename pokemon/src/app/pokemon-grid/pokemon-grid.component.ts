@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Pokemon, PokemonFullDto, PokemonRequest } from '../models/pokemon.model';
+import { Pokemon,  } from '../models/pokemon.model';
 import { PokemonGridService } from '../services/pokemon-grid.service';
 import { confirm } from 'devextreme/ui/dialog';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
@@ -88,7 +88,8 @@ export class PokemonGridComponent implements OnInit {
           moveName: m.moveName,
           movePower: m.movePower,
           movePP: m.movePP,
-          movePokeTypeID: m.movePokeTypeID
+          movePokeTypeID: m.movePokeTypeID,
+          movePokeType: this.types.find(t => t.pokeTypeID === m.movePokeTypeID) || null
         }));
         this.moves$.next(this.moves);
       }
@@ -125,37 +126,6 @@ export class PokemonGridComponent implements OnInit {
     selectedPokemon.regions = pokemon.regions.map(regions => this.regions.find(m => m.regionID === regions.regionID)!);
     selectedPokemon.pokemonTrainerID = pokemon.trainer?.trainerID || null;
     return selectedPokemon;
-  }
-  
-  private convertToDto(pokemon: Pokemon): PokemonFullDto {
-    return {
-      pokemonID: pokemon.pokemonID,
-      pokemonName: pokemon.pokemonName,
-      pokemonPictureID: pokemon.pokemonPictureID || undefined,
-      pokemonTrainerID: pokemon.pokemonTrainerID || undefined,
-      evolutionGroupID: pokemon.evolutionGroupID || undefined,
-      types: pokemon.types.map(t => ({
-        pokeTypeID: t.pokeTypeID,
-        typeName: t.typeName 
-      })),
-      moves: pokemon.moves.map(m => ({
-        moveID: m.moveID,
-        moveName: m.moveName, 
-        movePower: m.movePower,
-        movePP: m.movePP,
-        movePokeTypeID: m.movePokeTypeID
-      })),
-      regions: pokemon.regions.map(r => ({
-        regionID: r.regionID,
-        regionName: r.regionName, 
-        regionDescription: r.regionDescription 
-      })),
-      evolutionStages: pokemon.evolutionStages?.map(s => ({
-        groupID: s.groupID,
-        stageOrder: s.stageOrder,
-        pokemonID: s.pokemonID
-      })) || []
-    };
   }
 
   private initializeNewPokemon(): Pokemon {
@@ -194,10 +164,8 @@ export class PokemonGridComponent implements OnInit {
   }
 
   saveChanges() {  
-    const dto = this.convertToDto(this.selectedPokemon!);
-    const requestBody: PokemonRequest = { pokemonDto: dto };
+    const dto = (this.selectedPokemon!);
 
-    
     if (this.isNewPokemon) {
       this.pgs.createPokemon(dto).subscribe({
         next: () => {

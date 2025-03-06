@@ -9,54 +9,14 @@ import { Trainer } from "./trainer.model";
 export interface Pokemon {
   pokemonID: number;
   pokemonName: string;
-  pokemonPictureID: number | null;
-  pokemonTrainerID: number | null;
-  evolutionGroupID: number | null;
-  pokemonPicture: Picture | null;
+  pokemonPictureID?: number | null;
+  pokemonTrainerID?: number | null;
+  evolutionGroupID?: number | null;
+  pokemonPicture?: Picture | null;
   trainer?: Trainer | null;
   types: PokemonType[];
   moves: Move[];
   regions: Region[];
-  evolutionGroup: EvolutionGroup | null;
-  evolutionStages: EvolutionStage[];
-}
-
-export interface PokemonFullDto {
-  pokemonID?: number;
-  pokemonName: string;
-  pokemonPictureID?: number | null;
-  pokemonTrainerID?: number | null;
-  evolutionGroupID?: number | null;
-  types: PokeTypeDto[];
-  moves: MoveDto[];
-  regions: RegionDto[];
-  evolutionStages: EvolutionStageDto[];
-}
-
-export interface PokeTypeDto {
-  pokeTypeID: number;
-  typeName: string;
-}
-
-export interface MoveDto {
-  moveID: number;
-  moveName: string;
-  movePP: number;
-  movePower: number;
-}
-
-export interface RegionDto {
-  regionID: number;
-  regionName: string;
-  regionDescription: string;
-}
-
-export interface EvolutionStageDto {
-  groupID: number;
-  stageOrder: number;
-  pokemonID?: number;
-}
-
-export interface PokemonRequest {
-  pokemonDto: PokemonFullDto;
+  evolutionGroup?: EvolutionGroup | null;
+  evolutionStages?: EvolutionStage[];
 }
