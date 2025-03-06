@@ -3,6 +3,7 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>6dae2030-ceb7-45e5-ab96-29264eada308</UserSecretsId>
     </PropertyGroup>
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="12.0.1" />
