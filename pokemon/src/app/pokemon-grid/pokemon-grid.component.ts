@@ -145,8 +145,13 @@ export class PokemonGridComponent implements OnInit {
     };
   }
 
-  async deletePokemon(event: any) {
-    const pokemonId = event.row.data.pokemonID;
+  async deletePokemon(e: any) {
+    if (!e.row.data.pokemonID) {
+      console.error("Invalid event data:", e);
+      return;
+  }
+    const pokemonId = e.row.data.pokemonID;
+    console.log("attempting delete ",pokemonId)
     const result = await confirm('Are you sure?', 'Delete Pokémon');
     if (result) {
       this.pgs.deletePokemon(pokemonId).subscribe({

@@ -19,5 +19,6 @@ namespace Pokemon.Models
         public virtual ICollection<Moveset> Moves { get; set; }
         public virtual ICollection<PokemonRegion> Regions { get; set; }
         public virtual ICollection<EvolutionStage> EvolutionStages { get; set; }
+
     }
 }

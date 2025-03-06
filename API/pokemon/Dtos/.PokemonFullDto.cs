@@ -6,7 +6,7 @@ public class PokemonFullDto
     public int PokemonID { get; set; }
 
     [Required]
-    public string PokemonName { get; set; }
+    public required string PokemonName { get; set; }
 
     public int? PokemonPictureID { get; set; }
     public int? PokemonTrainerID { get; set; } 

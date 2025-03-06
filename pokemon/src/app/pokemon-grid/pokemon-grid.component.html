@@ -39,8 +39,9 @@
   <dxi-column dataField="pokemonPicture.picturePath" caption="Image" cellTemplate="imageTemplate"></dxi-column>
 
   <dxi-column type="buttons" [width]="100">
-    <dxi-button text="Delete" (onClick)="deletePokemon($event)"></dxi-button>
+    <dxi-button text="Delete" [onClick]="deletePokemon.bind(this)"></dxi-button>
   </dxi-column>
+  
 
   <div *dxTemplate="let data of 'imageTemplate'">
     <img [src]="data.value" width="50" height="50" alt="Pokemon Image">

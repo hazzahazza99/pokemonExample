@@ -98,7 +98,7 @@ namespace Pokemon.Controllers
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return StatusCode(500, "Error creating Pokémon");
+                return StatusCode(500, "Error creating Pokémon" + ex.InnerException?.Message);
             }
         }
 
@@ -157,87 +157,48 @@ namespace Pokemon.Controllers
 
         private async Task ProcessRelationships(PokemonData pokemon, PokemonFullDto dto)
         {
-            await ClearRelationships(pokemon.PokemonID);
-
-            foreach (var typeId in dto.Types.Select(t => t.PokeTypeID))
+            foreach (var typeDto in dto.Types)
             {
-                pokemon.PokemonTypes.Add(new PokemonType
+                var pokemonType = new PokemonType
                 {
                     TypesPokemonID = pokemon.PokemonID,
-                    TypesPokeTypeID = typeId
-                });
+                    TypesPokeTypeID = typeDto.PokeTypeID
+                };
+                _context.PokemonTypes.Add(pokemonType);
             }
 
-            foreach (var moveId in dto.Moves.Select(m => m.MoveID))
+            foreach (var moveDto in dto.Moves)
             {
-                pokemon.Moves.Add(new Moveset
+                var pokemonMove = new Moveset
                 {
                     MovesetPokemonID = pokemon.PokemonID,
-                    MovesetMoveID = moveId
-                });
+                    MovesetMoveID = moveDto.MoveID
+                };
+                _context.Movesets.Add(pokemonMove);
             }
 
-            foreach (var regionId in dto.Regions.Select(r => r.RegionID))
+            foreach (var regionDto in dto.Regions)
             {
-                pokemon.Regions.Add(new PokemonRegion
+                var pokemonRegion = new PokemonRegion
                 {
                     RegionsPokemonID = pokemon.PokemonID,
-                    RegionsRegionID = regionId
-                });
+                    RegionsRegionID = regionDto.RegionID
+                };
+                _context.PokemonRegions.Add(pokemonRegion);
             }
 
-            if (dto.EvolutionGroupID.HasValue)
-                await UpdateEvolutionGroupIfChanged(dto.EvolutionGroupID.Value, dto.EvolutionStages);
-
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task ClearRelationships(int pokemonId)
-        {
-            var types = await _context.PokemonTypes.Where(pt => pt.TypesPokemonID == pokemonId).ToListAsync();
-            _context.PokemonTypes.RemoveRange(types);
-
-            var moves = await _context.Movesets.Where(m => m.MovesetPokemonID == pokemonId).ToListAsync();
-            _context.Movesets.RemoveRange(moves);
-
-            var regions = await _context.PokemonRegions.Where(pr => pr.RegionsPokemonID == pokemonId).ToListAsync();
-            _context.PokemonRegions.RemoveRange(regions);
-
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task UpdateEvolutionGroupIfChanged(int groupId, List<EvolutionStageDto> dtoStages)
-        {
-            var group = await _context.EvolutionGroups
-                .Include(g => g.EvolutionStages)
-                .FirstOrDefaultAsync(g => g.EvolutionGroupID == groupId);
-            if (group == null)
-                return;
-
-            var uniqueDtoStages = dtoStages.GroupBy(s => s.StageOrder).Select(g => g.First()).ToList();
-            var currentStages = group.EvolutionStages.ToDictionary(es => es.StageOrder);
-
-            foreach (var dtoStage in uniqueDtoStages)
+            /*foreach (var evolutionDto in dto.EvolutionStages)
             {
-                if (currentStages.TryGetValue(dtoStage.StageOrder, out var existingStage))
+                var evolutionStage = new EvolutionStage
                 {
-                    if (existingStage.PokemonID != dtoStage.PokemonID)
-                        existingStage.PokemonID = dtoStage.PokemonID;
-                    currentStages.Remove(dtoStage.StageOrder);
-                }
-                else
-                {
-                    group.EvolutionStages.Add(new EvolutionStage
-                    {
-                        GroupID = groupId,
-                        StageOrder = dtoStage.StageOrder,
-                        PokemonID = dtoStage.PokemonID
-                    });
-                }
-            }
+                    GroupID = evolutionDto.GroupID,
+                    StageOrder = evolutionDto.StageOrder,
+                    PokemonID = pokemon.PokemonID
+                };
 
-            if (currentStages.Any())
-                _context.EvolutionStages.RemoveRange(currentStages.Values);
+                _context.EvolutionStages.Add(evolutionStage);
+            }*/
+
 
             await _context.SaveChangesAsync();
         }
