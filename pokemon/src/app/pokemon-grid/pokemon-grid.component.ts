@@ -20,6 +20,7 @@ export class PokemonGridComponent implements OnInit {
   baseUrl = environment.baseUrl
   isDrawerOpen = false;
   selectedPokemon: Pokemon | null = null;
+  selectedPokemonClone: Pokemon | null = null;
   pokemonList$ = new BehaviorSubject<Pokemon[]>([]);
   types$ = new BehaviorSubject<PokemonType[]>([]);
   moves$ = new BehaviorSubject<Move[]>([]);
@@ -106,7 +107,6 @@ export class PokemonGridComponent implements OnInit {
       return;
   }
     const pokemonId = e.row.data.pokemonID;
-    console.log("attempting delete ",pokemonId)
     const result = await confirm('Are you sure?', 'Delete Pokémon');
     if (result) {
       this.pgs.deletePokemon(pokemonId).subscribe({
@@ -120,7 +120,8 @@ export class PokemonGridComponent implements OnInit {
     this.isNewPokemon = !pokemon;
     this.selectedPokemon = pokemon ? this.prepareSelectedPokemon(pokemon) : this.initializeNewPokemon();
     this.isDrawerOpen = true;
-    console.log(this.selectedPokemon)
+    this.selectedPokemonClone = this.selectedPokemon
+    console.log(this.selectedPokemonClone)
   }
 
   saveChanges() {  
@@ -143,6 +144,7 @@ export class PokemonGridComponent implements OnInit {
         error: (err) => console.error('Update failed:', err)
       });
     }
+    console.log(this.selectedPokemonClone,this.selectedPokemon)
   }
 
   closeDrawer() {
@@ -165,6 +167,10 @@ export class PokemonGridComponent implements OnInit {
   validateTypeSelection(e: any) {
     const selectedTypes = e.value;
     return selectedTypes && selectedTypes.length >= 1 && selectedTypes.length <= 2;
+  }
+
+  hasChanges(): boolean {
+    return this.selectedPokemon !== this.selectedPokemonClone;
   }
 
   getTrainerName(rowData: Pokemon): string {
@@ -194,4 +200,5 @@ export class PokemonGridComponent implements OnInit {
       ? rowData.evolutionStages.map(s => s.stageOrder).join(', ') 
       : '1';
   }
+  
 }

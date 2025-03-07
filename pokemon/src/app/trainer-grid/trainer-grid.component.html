@@ -7,6 +7,11 @@
     [filterRow]="{ visible: true }"
     [searchPanel]="{ visible: true }"
     (onRowClick)="openDrawer($event.data)">
+
+    
+    <div *dxTemplate="let data of 'imageTemplate'">
+      <img [src]="data.value" width="100" height="100" alt="Pokemon Image">
+    </div>
     
     <dxo-editing mode="popup"></dxo-editing>
     
@@ -19,8 +24,4 @@
         </dx-button>
       </dxi-item>
     </dxo-toolbar>
-
-    <div *dxTemplate="let data of 'photoTemplate'">
-      <img [src]="getPhotoUrl(data.value)" class="trainer-photo" alt="Trainer Photo">
-    </div>
   </dx-data-grid>

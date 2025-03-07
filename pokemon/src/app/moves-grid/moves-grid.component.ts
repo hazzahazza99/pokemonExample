@@ -17,7 +17,7 @@ export class MovesGridComponent implements OnInit {
   moveFormData: Partial<Move> = {};
   addButtonOptions: any;
 
-  constructor(private moveService: PokemonMoveService, private typeService: PokemonTypeService) {
+  constructor(private mov: PokemonMoveService, private typeService: PokemonTypeService) {
     this.addButtonOptions = {
       text: 'Add Move',
       type: 'success',
@@ -31,7 +31,7 @@ export class MovesGridComponent implements OnInit {
   }
 
   loadMoves(): void {
-    this.moveService.getAllMoves().subscribe({
+    this.mov.getAllMoves().subscribe({
       next: (moves) => this.moves = moves,
       error: (err) => console.error('Error loading moves:', err)
     });
@@ -40,7 +40,7 @@ export class MovesGridComponent implements OnInit {
   loadTypes() {
     this.typeService.getAllTypes().subscribe({
       next: (types) => this.type = types,
-      error: (err) => console.error('Error loading moves:', err)
+      error: (err) => console.error('Error loading types:', err)
     });
   }
 
@@ -50,7 +50,7 @@ export class MovesGridComponent implements OnInit {
       return;
     }
 
-    this.moveService.createMove(this.moveFormData as Move).subscribe({
+    this.mov.createMove(this.moveFormData as Move).subscribe({
       next: () => {
         this.loadMoves();
       },

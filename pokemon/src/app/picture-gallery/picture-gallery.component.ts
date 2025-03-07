@@ -23,7 +23,7 @@ export class PictureGalleryComponent implements OnInit {
         console.log(pictures)
       },
       error: (err) => {
-        console.error('Error loading types:', err);
+        console.error('Error loading pictures:', err);
       }
     });
   }

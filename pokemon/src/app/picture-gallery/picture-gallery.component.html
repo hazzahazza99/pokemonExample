@@ -17,6 +17,6 @@
     <dxi-column dataField="picturePath" caption="Picture Path"></dxi-column>
     <dxi-column dataField="picturePath" caption="Image" cellTemplate="imageTemplate"></dxi-column>
     <div *dxTemplate="let data of 'imageTemplate'">
-		<img [src]="data.value" width="100" height="100" alt="Pokemon Image">
-	</div>
+		  <img [src]="data.value" width="100" height="100" alt="Pokemon Image">
+	  </div>
 </dx-data-grid>
