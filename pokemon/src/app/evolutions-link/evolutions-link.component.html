@@ -1,0 +1,16 @@
+<dx-data-grid
+  id="regionsGrid"
+  [dataSource]="evolutions"
+  [showBorders]="true"
+  [columnAutoWidth]="true"
+  keyExpr="pokemonID">
+  <dxo-editing mode="popup"></dxo-editing>
+	<dxo-toolbar>
+		<dxi-item location="before">
+			<dx-button
+        icon="plus"
+        text="Add New Link"
+        ></dx-button>
+		</dxi-item>
+	</dxo-toolbar>
+</dx-data-grid>

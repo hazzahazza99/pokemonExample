@@ -1,4 +1,8 @@
-﻿using Pokemon.Dtos;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
+using Pokemon.Data;
+using Pokemon.Dtos;
 using Pokemon.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,26 +11,23 @@ namespace Pokemon.Services
 {
     public class MoveService : IMoveService
     {
-        private readonly List<MoveDto> _mockMoves = new()
-    {
-        new MoveDto
+        private readonly DataContext _context;
+        private readonly IMapper _mapper;
+
+        public MoveService(DataContext context, IMapper mapper)
         {
-            MoveID = 1,
-            MoveName = "Ember",
-            MovePower = 40,
-            MovePP = 25,
-            MovePokeTypeID = 1,
-            MovePokeType = new PokeTypeDto
-            {
-                PokeTypeID = 1,
-                TypeName = "Fire"
-            }
+            _context = context;
+            _mapper = mapper;
         }
-    };
 
         public async Task<List<MoveDto>> GetAllMoves()
         {
-            return await Task.FromResult(_mockMoves);
+            var moves = await _context.Moves
+                .AsNoTracking()
+                .ProjectTo<MoveDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return moves;
         }
     }
 }

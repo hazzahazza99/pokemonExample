@@ -1,0 +1,22 @@
+<dx-data-grid
+  id="picturesGrid"
+  [dataSource]="pictures"
+  [showBorders]="true"
+  [columnAutoWidth]="true"
+  keyExpr="pictureID">
+  <dxo-editing mode="popup"></dxo-editing>
+	<dxo-toolbar>
+		<dxi-item location="before">
+			<dx-button
+        icon="plus"
+        text="Add New Picture"
+        ></dx-button>
+		</dxi-item>
+	</dxo-toolbar>
+    <dxi-column dataField="pictureID" caption="Picture ID"></dxi-column>
+    <dxi-column dataField="picturePath" caption="Picture Path"></dxi-column>
+    <dxi-column dataField="picturePath" caption="Image" cellTemplate="imageTemplate"></dxi-column>
+    <div *dxTemplate="let data of 'imageTemplate'">
+		<img [src]="data.value" width="100" height="100" alt="Pokemon Image">
+	</div>
+</dx-data-grid>

@@ -1,92 +1,26 @@
-<dx-drawer
-  [opened]="isDrawerOpen"
-  position="right"
-  revealMode="slide"
-  openedStateMode="shrink"
-  [height]="'100vh'"
-  [width]="450"
-  [shading]="false"
-  (onOptionChanged)="handleDrawerState($event)">
+  <dx-data-grid
+    [dataSource]="trainers"
+    [keyExpr]="'trainerID'"
+    (columns)="columns"
+    [allowColumnResizing]="true"
+    [paging]="{ pageSize: 10 }"
+    [filterRow]="{ visible: true }"
+    [searchPanel]="{ visible: true }"
+    (onRowClick)="openDrawer($event.data)">
+    
+    <dxo-editing mode="popup"></dxo-editing>
+    
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <dx-button
+          icon="plus"
+          text="Add New Trainer"
+          (onClick)="openDrawer()">
+        </dx-button>
+      </dxi-item>
+    </dxo-toolbar>
 
-  <div *dxTemplate="let data of 'content'">
-    <dx-data-grid
-      [dataSource]="trainers"
-      [keyExpr]="'trainerID'"
-      (columns)="columns"
-      [allowColumnResizing]="true"
-      [paging]="{ pageSize: 10 }"
-      [filterRow]="{ visible: true }"
-      [searchPanel]="{ visible: true }"
-      (onRowClick)="openDrawer($event.data)">
-      
-      <dxo-editing mode="popup"></dxo-editing>
-      
-      <dxo-toolbar>
-        <dxi-item location="before">
-          <dx-button
-            icon="plus"
-            text="Add New Trainer"
-            (onClick)="openDrawer()">
-          </dx-button>
-        </dxi-item>
-      </dxo-toolbar>
-
-      <div *dxTemplate="let data of 'photoTemplate'">
-        <img [src]="getPhotoUrl(data.value)" class="trainer-photo" alt="Trainer Photo">
-      </div>
-    </dx-data-grid>
-  </div>
-
-  <div *dxTemplate="let data of 'panel'">
-    <div class="drawer-content" [hidden]="!selectedTrainer">
-        <div *ngIf="selectedTrainer">
-            <h3>{{ isNewTrainer ? 'Add New' : 'Edit' }} Trainer</h3>
-            
-            <dx-form
-                [formData]="selectedTrainer"
-                [colCount]="1"
-                [showValidationSummary]="true">
-                
-                <dxi-item 
-                dataField="trainerName"
-                caption="Name"
-                [validationRules]="[{ type: 'required', message: 'Name is required' }]">
-                </dxi-item>
-                
-                <dxi-item 
-                dataField="trainerAge"
-                caption="Age"
-                editorType="dxNumberBox"
-                [editorOptions]="{ min: 10, max: 100 }">
-                </dxi-item>
-                
-                <dxi-item n
-                dataField="trainerBadge"
-                caption="Badges"
-                editorType="dxNumberBox"
-                [editorOptions]="{ min: 0, max: 8 }">
-                </dxi-item>
-                
-                <dxi-item 
-                dataField="trainerIsGymLeader"
-                caption="Gym Leader"
-                editorType="dxCheckBox">
-                </dxi-item>
-                
-                <dxi-item>
-                <dx-button 
-                    text="Save" 
-                    type="success" 
-                    (onClick)="saveTrainer()">
-                </dx-button>
-                <dx-button 
-                    text="Cancel" 
-                    type="danger" 
-                    (onClick)="closeDrawer()">
-                </dx-button>
-                </dxi-item>
-            </dx-form>
-        </div>
+    <div *dxTemplate="let data of 'photoTemplate'">
+      <img [src]="getPhotoUrl(data.value)" class="trainer-photo" alt="Trainer Photo">
     </div>
-  </div>
-</dx-drawer>
+  </dx-data-grid>

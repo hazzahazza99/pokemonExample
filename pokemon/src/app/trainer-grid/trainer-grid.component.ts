@@ -1,4 +1,3 @@
-// trainer-grid.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Trainer } from '../models/trainer.model';
 import { TrainerGridService } from '../services/trainer-grid.service';

@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../env/environment';
-import { Move } from '../models/move.model';
 import { EvolutionStage } from '../models/evolution-stage.model';
 
 @Injectable({

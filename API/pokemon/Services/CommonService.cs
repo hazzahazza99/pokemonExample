@@ -1,4 +1,5 @@
 ﻿using Pokemon.Dtos;
+using Pokemon.Models;
 using Pokemon.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -26,19 +27,18 @@ namespace Pokemon.Services
 
         public async Task<GridCommonDto> GetAllData()
         {
-            var typesTask = _typeService.GetAllTypes();
-            var movesTask = _moveService.GetAllMoves();
-            var regionsTask = _regionService.GetAllRegions();
-            var trainersTask = _trainerService.GetAllTrainers();
+            var types = await _typeService.GetAllTypes();
+            var moves = await _moveService.GetAllMoves();
+            var regions = await _regionService.GetAllRegions();
+            var trainers = await _trainerService.GetAllTrainers();
 
-            await Task.WhenAll(typesTask, movesTask, regionsTask, trainersTask);
 
             return new GridCommonDto
             {
-                Types = await typesTask,
-                Moves = await movesTask,
-                Regions = await regionsTask,
-                Trainers = await trainersTask
+                Types = types,
+                Moves = moves,
+                Regions = regions,
+                Trainers = trainers
             };
         }
 

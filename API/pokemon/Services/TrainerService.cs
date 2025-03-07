@@ -1,28 +1,33 @@
 ﻿using Pokemon.Dtos;
 using Pokemon.Services.Interfaces;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
+using Pokemon.Data;
+using Pokemon.Dtos;
+using Pokemon.Services.Interfaces;
 
 namespace Pokemon.Services
 {
     public class TrainerService : ITrainerService
     {
-        private readonly List<TrainerDto> _mockTrainers = new()
-    {
-        new TrainerDto
+        private readonly DataContext _context;
+        private readonly IMapper _mapper;
+
+        public TrainerService(DataContext context, IMapper mapper)
         {
-            TrainerID = 1,
-            TrainerName = "Brock",
-            TrainerAge = 28,
-            TrainerBadge = 5,
-            TrainerIsGymLeader = true,
-            TrainerPhotoID = 9
+            _context = context;
+            _mapper = mapper;
         }
-    };
 
         public async Task<List<TrainerDto>> GetAllTrainers()
         {
-            return await Task.FromResult(_mockTrainers);
+            var trainers = await _context.Trainers
+                .AsNoTracking()
+                .ProjectTo<TrainerDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return trainers;
         }
     }
 }

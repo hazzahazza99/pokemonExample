@@ -1,0 +1,16 @@
+<dx-data-grid
+  id="regionsGrid"
+  [dataSource]="regions"
+  [showBorders]="true"
+  [columnAutoWidth]="true"
+  keyExpr="regionID">
+  <dxo-editing mode="popup"></dxo-editing>
+	<dxo-toolbar>
+		<dxi-item location="before">
+			<dx-button
+        icon="plus"
+        text="Add New Region"
+        ></dx-button>
+		</dxi-item>
+	</dxo-toolbar>
+</dx-data-grid>

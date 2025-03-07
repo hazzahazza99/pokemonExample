@@ -7,6 +7,15 @@
       [allowColumnResizing]="true"
       [rowAlternationEnabled]="true"
       keyExpr="moveID">
+      <dxo-editing mode="popup"></dxo-editing>
+        <dxo-toolbar>
+            <dxi-item location="before">
+                <dx-button
+            icon="plus"
+            text="Add New Move"
+            ></dx-button>
+            </dxi-item>
+        </dxo-toolbar>
       
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager [showInfo]="true" [showNavigationButtons]="true"></dxo-pager>

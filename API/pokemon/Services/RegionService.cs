@@ -1,25 +1,33 @@
 ﻿using Pokemon.Dtos;
 using Pokemon.Services.Interfaces;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
+using Pokemon.Data;
+using Pokemon.Dtos;
+using Pokemon.Services.Interfaces;
 
 namespace Pokemon.Services
 {
     public class RegionService : IRegionService
     {
-        private readonly List<RegionDto> _mockRegions = new()
-    {
-        new RegionDto
+        private readonly DataContext _context;
+        private readonly IMapper _mapper;
+
+        public RegionService(DataContext context, IMapper mapper)
         {
-            RegionID = 1,
-            RegionName = "Kanto",
-            RegionDescription = "The starting region for many Pokémon trainers"
+            _context = context;
+            _mapper = mapper;
         }
-    };
 
         public async Task<List<RegionDto>> GetAllRegions()
         {
-            return await Task.FromResult(_mockRegions);
+            var regions = await _context.Regions
+                .AsNoTracking()
+                .ProjectTo<RegionDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return regions;
         }
     }
 }

@@ -3,16 +3,12 @@ import { BehaviorSubject } from 'rxjs';
 import { Pokemon,  } from '../models/pokemon.model';
 import { PokemonGridService } from '../services/pokemon-grid.service';
 import { confirm } from 'devextreme/ui/dialog';
-import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
-import { PokemonTypeService } from '../services/types-list.service';
-import { PokemonMoveService } from '../services/moves-grid.service';
 import { PokemonType } from '../models/pokemon-type.model';
 import { Move } from '../models/move.model';
 import { Region } from '../models/region.model';
-import { RegionsService } from '../services/regions.service';
 import { environment } from '../env/environment';
-import { TrainerGridService } from '../services/trainer-grid.service';
 import { Trainer } from '../models/trainer.model';
+import { CommonService } from '../services/common.service';
 
 @Component({
   selector: 'app-pokemon-grid',
@@ -38,18 +34,12 @@ export class PokemonGridComponent implements OnInit {
 
   constructor(
     private pgs: PokemonGridService, 
-    private typeserv: PokemonTypeService,
-    private moveserv: PokemonMoveService,
-    private regserv: RegionsService,
-    private trs: TrainerGridService,
+    private com: CommonService
   ) {}
 
   ngOnInit(): void {
     this.loadPokemon();
-    this.loadTypes();
-    this.loadMoves();
-    this.loadRegions();
-    this.loadTrainers();
+    this.loadCommonData();
   }
 
   private loadPokemon() {
@@ -61,56 +51,28 @@ export class PokemonGridComponent implements OnInit {
     });
   }
 
-  private loadTypes() {
-    this.typeserv.getAllTypes().subscribe({
+  private loadCommonData() {
+    this.com.getAllCommonData().subscribe({
       next: (data) => {
-        this.types = data.map(t => ({
-          pokeTypeID: t.pokeTypeID,
-          typeName: t.typeName,
-        }));
+        this.types = data.types;
         this.types$.next(this.types);
-      }
-    });
-  }
-  
-  private loadMoves() {
-    this.moveserv.getAllMoves().subscribe({
-      next: (data) => {
-        this.moves = data.map(m => ({
-          moveID: m.moveID,
-          moveName: m.moveName,
-          movePower: m.movePower,
-          movePP: m.movePP,
-          movePokeTypeID: m.movePokeTypeID,
+
+        this.moves = data.moves.map(m => ({
+          ...m,
           movePokeType: this.types.find(t => t.pokeTypeID === m.movePokeTypeID) || null
         }));
         this.moves$.next(this.moves);
-      }
-    });
-  }
-  
-  private loadRegions() {
-    this.regserv.getAllRegions().subscribe({
-      next: (data) => {
-        this.regions = data.map(r => ({
-          regionID: r.regionID,
-          regionName: r.regionName,
-          regionDescription: r.regionDescription
-        }));
+
+        this.regions = data.regions;
         this.regions$.next(this.regions);
-      }
+
+        this.trainers = data.trainers;
+        this.trainers$.next(this.trainers);
+      },
+      error: (err) => console.error('Failed to load common data:', err)
     });
   }
 
-  private loadTrainers() {
-    this.trs.getAllTrainers().subscribe({
-      next: (data) => {
-        this.trainers$.next(data);  
-        this.trainers = data;       
-      },
-      error: (err) => console.error('Error loading Pokemon:', err)
-    });
-  }
 
   private prepareSelectedPokemon(pokemon: Pokemon): Pokemon {
     const selectedPokemon = { ...pokemon };
@@ -183,7 +145,6 @@ export class PokemonGridComponent implements OnInit {
     }
   }
 
-
   closeDrawer() {
     this.isDrawerOpen = false;
     this.selectedPokemon = null;
@@ -205,7 +166,6 @@ export class PokemonGridComponent implements OnInit {
     const selectedTypes = e.value;
     return selectedTypes && selectedTypes.length >= 1 && selectedTypes.length <= 2;
   }
-
 
   getTrainerName(rowData: Pokemon): string {
     return rowData?.trainer?.trainerName || 'Wild Pokemon';
